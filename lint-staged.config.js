@@ -1,8 +1,14 @@
 module.exports = {
   // Frontend: Next.js files
-  "frontend/**/*.{js,jsx,ts,tsx}": ["eslint --fix --max-warnings=0", "prettier --write"],
+  'frontend/**/*.{js,jsx,ts,tsx}': [
+    'yarn --cwd frontend eslint --fix --max-warnings=0',
+    'npx prettier --write',
+  ],
   // Backend: NestJS files
-  "backend/**/*.{js,ts}": ["eslint --fix --max-warnings=0", "prettier --write"],
+  'backend/**/*.{js,ts}': [
+    'yarn --cwd backend eslint --fix --max-warnings=0',
+    'npx prettier --write',
+  ],
   // Run npm audit on package.json changes
-  "{frontend,backend}/package.json": () => ["npm audit --audit-level=moderate"],
-}
+  '{frontend,backend}/package.json': () => ['yarn audit --level=moderate'],
+};
