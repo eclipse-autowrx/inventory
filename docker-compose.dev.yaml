@@ -1,0 +1,25 @@
+services:
+  frontend:
+    build: 
+      context: frontend
+      dockerfile: Dockerfile.dev
+    # Serve through default port of nextjs application
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+    restart: no
+
+  backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - .env.dev
+    restart: no
+    command: yarn start:dev

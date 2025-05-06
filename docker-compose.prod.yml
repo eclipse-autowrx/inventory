@@ -1,0 +1,20 @@
+services:
+  frontend:
+    build: 
+      context: frontend
+      dockerfile: Dockerfile
+    image: ghcr.io/eclipse-autowrx/inventory-frontend:latest   
+    # Serve through nginx of docker container
+    ports:
+      - "3000:80"
+    restart: always
+
+  backend:
+    build: 
+      context: backend
+      dockerfile: Dockerfile
+    image: ghcr.io/eclipse-autowrx/inventory-backend:latest
+    env_file:
+      - .env
+    restart: always
+    command: yarn start:prod

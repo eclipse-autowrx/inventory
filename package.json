@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "repository": "git@github.com:tuan-hda/inventory.git",
   "author": "tuan-hda <anhtuan.hoangdinh@gmail.com>",
-  "license": "MIT",
+  "license": "cc-by-4.0",
   "scripts": {
-    "lint": "npm run lint --prefix frontend && npm run lint --prefix backend",
+    "lint": "yarn lint --prefix frontend && yarn lint --prefix backend",
     "format": "prettier --write 'frontend/**/*.{js,jsx,ts,tsx}' 'backend/**/*.{js,ts}'",
-    "type-check": "cd frontend && npx tsc --noEmit && cd ../backend && npx tsc --noEmit",
+    "type-check": "cd frontend && yarn tsc --noEmit && cd ../backend && yarn tsc --noEmit",
     "prepare": "husky"
   }
 }

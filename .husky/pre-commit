@@ -5,4 +5,4 @@ npx lint-staged
 cd frontend && yarn tsc --noEmit && cd ..
 
 # Run TypeScript type-checking for backend (NestJS)
-cd backend && yarn tsc --noEmit && cd ..
+cd backend && yarn tsc --noEmit --project tsconfig.lint.json && cd ..
