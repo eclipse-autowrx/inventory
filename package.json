@@ -1,0 +1,13 @@
+{
+  "name": "inventory",
+  "version": "1.0.0",
+  "repository": "git@github.com:tuan-hda/inventory.git",
+  "author": "tuan-hda <anhtuan.hoangdinh@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "lint": "npm run lint --prefix frontend && npm run lint --prefix backend",
+    "format": "prettier --write 'frontend/**/*.{js,jsx,ts,tsx}' 'backend/**/*.{js,ts}'",
+    "type-check": "cd frontend && npx tsc --noEmit && cd ../backend && npx tsc --noEmit",
+    "prepare": "husky"
+  }
+}

@@ -1,0 +1,8 @@
+# Run lint-staged for linting and formatting
+npx lint-staged
+
+# Run TypeScript type-checking for frontend (Next.js)
+cd frontend && npx tsc --noEmit && cd ..
+
+# Run TypeScript type-checking for backend (NestJS)
+cd backend && npx tsc --noEmit && cd ..
