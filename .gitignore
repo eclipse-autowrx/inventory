@@ -1,0 +1,51 @@
+# Node.js / General
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Editor and OS files
+.DS_Store
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Next.js (Frontend)
+.next/
+out/
+build/
+.vercel/
+coverage/
+
+# NestJS (Backend)
+dist/
+coverage/
+*.log
+*.pid
+*.pid.lock
+nestjs-cli.json
+
+# Testing
+/coverage
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Miscellaneous
+*.bak
+*.gho
+*.orig
+*.tmp
+*.tmp.*
