@@ -4,7 +4,9 @@ services:
     container_name: inventory-frontend
     networks:
       - inventory-network
-
+    depends_on:
+      - backend
+      
   backend:
     platform: linux/amd64
     container_name: inventory-backend
