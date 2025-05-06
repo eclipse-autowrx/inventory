@@ -1,0 +1,51 @@
+title = "Gitleaks Configuration for Next.js and NestJS"
+
+# Extend default rules
+[extend]
+useDefault = true
+
+# Allowlist for specific files or patterns (e.g., ignore test files or mocks)
+[[allowlist]]
+description = "Ignore test and mock files"
+paths = [
+  '''frontend/.*\.test\..*''',
+  '''frontend/.*\.spec\..*''',
+  '''frontend/__mocks__/.*''',
+  '''backend/.*\.test\..*''',
+  '''backend/.*\.spec\..*''',
+  '''backend/test/.*'''
+]
+
+# Custom rules for sensitive data specific to your projects
+[[rules]]
+description = "API Key in Next.js environment variables"
+regex = '''NEXT_PUBLIC_[A-Z0-9_]+_KEY\s*=\s*['"][a-zA-Z0-9+/=]{32,64}['"]'''
+file = '''frontend/.env.*'''
+tags = ["key", "nextjs"]
+
+[[rules]]
+description = "NestJS database credentials"
+regex = '''(DATABASE_URL|DB_[A-Z0-9_]+)\s*=\s*['"][a-zA-Z0-9:/@._-]+['"]'''
+file = '''backend/.env.*'''
+tags = ["database", "nestjs"]
+
+# Allowlist for safe patterns (e.g., example credentials in README or docs)
+[[allowlist]]
+description = "Ignore example credentials in documentation"
+regexes = [
+  '''example-api-key''',
+  '''test-credential''',
+  '''dummy-key'''
+]
+paths = [
+  '''.*\.md$''',
+  '''.*README.*'''
+]
+
+# Whitelist specific commits or files if needed
+[[allowlist]]
+description = "Safe files"
+paths = [
+  '''frontend/.env.example''',
+  '''backend/.env.example'''
+]
