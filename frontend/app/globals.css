@@ -1,5 +1,6 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @custom-variant dark (&:is(.dark *));
 
@@ -112,184 +113,175 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/*********** Font size and weight ********************/
+.da-txt-tiny {
+  font-size: 12px;
 }
 
-@layer components {
-  /*********** Font size and weight ********************/
-  .da-txt-tiny {
-    font-size: 12px;
-  }
+.da-txt-small {
+  font-size: 14px;
+}
 
-  .da-txt-small {
-    font-size: 14px;
-  }
+.da-txt-regular {
+  font-size: 16px;
+}
 
-  .da-txt-regular {
-    font-size: 16px;
-  }
+.da-txt-medium {
+  font-size: 18px;
+}
 
-  .da-txt-medium {
-    font-size: 18px;
-  }
+.da-txt-large {
+  font-size: 20px;
+}
 
-  .da-txt-large {
-    font-size: 20px;
-  }
+.da-txt-huge {
+  font-size: 24px;
+}
 
-  .da-txt-huge {
-    font-size: 24px;
-  }
+.da-nav-bar-logo {
+  height: 30px;
+}
 
-  .da-nav-bar-logo {
-    height: 30px;
-  } /*********** For Text Component ********************/
+/*********** For Text Component ********************/
 
-  .da-label-regular {
-    @apply da-txt-regular font-normal;
-  }
+.da-label-regular {
+  @apply da-txt-regular font-normal;
+}
 
-  .da-label-regular-medium {
-    @apply da-txt-regular font-medium;
-  }
+.da-label-regular-medium {
+  @apply da-txt-regular font-medium;
+}
 
-  .da-label-regular-bold {
-    @apply da-txt-regular font-semibold;
-  }
+.da-label-regular-bold {
+  @apply da-txt-regular font-semibold;
+}
 
-  .da-label-tiny {
-    @apply da-txt-tiny;
-  }
+.da-label-tiny {
+  @apply da-txt-tiny;
+}
 
-  .da-label-small {
-    @apply da-txt-small font-normal;
-  }
+.da-label-small {
+  @apply da-txt-small font-normal;
+}
 
-  .da-label-small-bold {
-    @apply da-txt-small font-semibold;
-  }
+.da-label-small-bold {
+  @apply da-txt-small font-semibold;
+}
 
-  .da-label-small-medium {
-    @apply da-txt-small font-medium;
-  }
+.da-label-small-medium {
+  @apply da-txt-small font-medium;
+}
 
-  .da-label-sub-title {
-    @apply da-txt-medium font-semibold;
-  }
+.da-label-sub-title {
+  @apply da-txt-medium font-semibold;
+}
 
-  .da-label-title {
-    @apply da-txt-large font-semibold;
-  }
+.da-label-title {
+  @apply da-txt-large font-semibold;
+}
 
-  .da-label-huge {
-    @apply da-txt-huge font-normal;
-  }
+.da-label-huge {
+  @apply da-txt-huge font-normal;
+}
 
-  .da-label-huge-bold {
-    @apply da-txt-huge font-semibold;
-  }
+.da-label-huge-bold {
+  @apply da-txt-huge font-semibold;
+}
 
-  /*********** For Button Component ********************/
-  .da-btn-dash {
-    @apply p-2 text-da-primary-500 hover:bg-da-primary-100 border border-dashed border-da-primary-500 rounded;
-  }
+/*********** For Button Component ********************/
+.da-btn-dash {
+  @apply p-2 text-da-primary-500 hover:bg-da-primary-100 border border-dashed border-da-primary-500 rounded;
+}
 
-  .da-btn {
-    @apply select-none cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
-  }
+.da-btn {
+  @apply select-none cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+}
 
-  .da-btn-solid {
-    @apply bg-da-primary-500 text-da-white shadow hover:bg-da-primary-500/90;
-  }
+.da-btn-solid {
+  @apply bg-da-primary-500 text-da-white shadow hover:bg-da-primary-500/90;
+}
 
-  .da-btn-outline {
-    @apply border text-da-primary-500 border-da-primary-500 shadow-sm hover:bg-da-primary-500/10;
-  }
+.da-btn-outline {
+  @apply border text-da-primary-500 border-da-primary-500 shadow-sm hover:bg-da-primary-500/10;
+}
 
-  .da-btn-outline-nocolor {
-    @apply border bg-white text-da-gray-medium border-da-gray-light hover:bg-da-gray-light shadow;
-  }
+.da-btn-outline-nocolor {
+  @apply border bg-white text-da-gray-medium border-da-gray-light hover:bg-da-gray-light shadow;
+}
 
-  .da-btn-plain {
-    @apply text-da-gray-medium hover:bg-da-primary-100 hover:text-da-primary-500;
-  }
+.da-btn-plain {
+  @apply text-da-gray-medium hover:bg-da-primary-100 hover:text-da-primary-500;
+}
 
-  .da-btn-editor {
-    @apply text-da-primary-500 hover:bg-da-primary-100;
-  }
+.da-btn-editor {
+  @apply text-da-primary-500 hover:bg-da-primary-100;
+}
 
-  .da-btn-text {
-    @apply text-da-primary-500 hover:underline;
-  }
+.da-btn-text {
+  @apply text-da-primary-500 hover:underline;
+}
 
-  .da-btn-link {
-    @apply text-da-gray-medium hover:underline;
-  }
+.da-btn-link {
+  @apply text-da-gray-medium hover:underline;
+}
 
-  .da-btn-gradient {
-    @apply bg-gradient-to-r from-da-gradient-from to-da-gradient-to text-da-white shadow-sm hover:opacity-90;
-  }
+.da-btn-gradient {
+  @apply bg-gradient-to-r from-da-gradient-from to-da-gradient-to text-da-white shadow-sm hover:opacity-90;
+}
 
-  .da-btn-secondary {
-    @apply bg-da-gray-medium text-da-white shadow-sm hover:bg-da-gray-medium/80;
-  }
+.da-btn-secondary {
+  @apply bg-da-gray-medium text-da-white shadow-sm hover:bg-da-gray-medium/80;
+}
 
-  .da-btn-destructive {
-    @apply text-da-gray-medium hover:text-da-destructive hover:bg-da-destructive/10;
-  }
+.da-btn-destructive {
+  @apply text-da-gray-medium hover:text-da-destructive hover:bg-da-destructive/10;
+}
 
-  .da-btn-sm {
-    @apply h-8 rounded-md px-2 py-1 da-txt-small;
-  }
+.da-btn-sm {
+  @apply h-8 rounded-md px-2 py-1 da-txt-small;
+}
 
-  .da-btn-md {
-    @apply h-10 rounded-md px-4 py-1 da-txt-regular;
-  }
+.da-btn-md {
+  @apply h-10 rounded-md px-4 py-1 da-txt-regular;
+}
 
-  .da-btn-lg {
-    @apply h-12 rounded-md px-4 py-1 da-txt-medium;
-  }
+.da-btn-lg {
+  @apply h-12 rounded-md px-4 py-1 da-txt-medium;
+}
 
-  /*********** For Block Component ********************/
-  .da-block-bare {
-    @apply px-4 py-2 flex items-center justify-center;
-  }
+/*********** For Block Component ********************/
+.da-block-bare {
+  @apply px-4 py-2 flex items-center justify-center;
+}
 
-  .da-block-default {
-    @apply text-white bg-da-primary-500;
-  }
+.da-block-default {
+  @apply text-white bg-da-primary-500;
+}
 
-  .da-block-outline {
-    @apply text-da-primary-500 border border-da-primary-500;
-  }
+.da-block-outline {
+  @apply text-da-primary-500 border border-da-primary-500;
+}
 
-  /*********** NAV BAR ********************/
-  .da-nav-bar {
-    height: 56px;
-    max-height: 56px;
-    @apply px-2 md:px-4 py-2 flex items-center w-full;
-  }
+/*********** NAV BAR ********************/
+.da-nav-bar {
+  height: 56px;
+  max-height: 56px;
+  @apply px-2 md:px-4 py-2 flex items-center w-full;
+}
 
-  /*********** Textarea Component ****************/
-  .da-textarea {
-    @apply flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-da-primary-500 disabled:opacity-50;
-  }
+/*********** Textarea Component ****************/
+.da-textarea {
+  @apply flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-da-primary-500 disabled:opacity-50;
+}
 
-  /*********** Menu Component ********************/
+/*********** Menu Component ********************/
 
-  .da-menu-item {
-    @apply da-btn-plain da-btn-sm mx-1 cursor-pointer da-label-small-medium;
-  }
+.da-menu-item {
+  @apply da-btn-plain da-btn-sm mx-1 cursor-pointer da-label-small-medium;
+}
 
-  .da-menu-dropdown {
-    @apply !rounded-lg !px-1;
-  }
+.da-menu-dropdown {
+  @apply !rounded-lg !px-1;
 }
 
 /*********** Popup ********************/
