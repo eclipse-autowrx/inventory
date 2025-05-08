@@ -3,7 +3,7 @@ import DaText from './DaText';
 import { TbLoader, TbUpload, TbX } from 'react-icons/tb';
 import clsx from 'clsx';
 import { DaButton } from './DaButton';
-import { uploadFileService } from '@/services/upload';
+import { uploadFileService } from '@/services/upload.service';
 import { toast } from 'react-toastify';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
@@ -210,6 +210,8 @@ const DaFileUpload = ({
           {isImage && (file || image) && (
             <div className="flex h-full" style={{ minHeight: MIN_HEIGHT }}>
               <Image
+                width={120}
+                height={120}
                 src={file ? URL.createObjectURL(file) : image!}
                 alt="preview"
                 className={clsx(

@@ -1,13 +1,13 @@
 import { DaButton } from '@/components/atoms/DaButton';
 import DaText from '@/components/atoms/DaText';
-import { roles } from '@/lib/data';
+import { roles } from '@/lib/mock/data';
 import { TbListTree } from 'react-icons/tb';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function InventoryRoleBrowser() {
   return (
-    <div className="container">
+    <div className="container py-4">
       <div className="flex-1 min-w-0 flex gap-2">
         <DaText variant="title" className="text-da-primary-500">
           Role Browser

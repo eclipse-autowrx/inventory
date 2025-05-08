@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { InventoryItem } from '@/types/inventory.type';
 import { User } from '@/types/user.type';
 
@@ -3495,7 +3496,7 @@ const hashStr = (s: string) => {
   return hash;
 };
 
-export const joinCreatedByData = (data: unknown[], users?: User[]) => {
+export const joinCreatedByData = (data: any[], users?: Partial<User>[]) => {
   if (!users || users.length === 0) {
     return data;
   }
