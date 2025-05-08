@@ -9,8 +9,5 @@
     "format": "prettier --write 'frontend/**/*.{js,jsx,ts,tsx}' 'backend/**/*.{js,ts}'",
     "type-check": "cd frontend && yarn tsc --noEmit && cd ../backend && yarn tsc --noEmit",
     "prepare": "husky"
-  },
-  "dependencies": {
-    "lodash": "^4.17.21"
   }
 }
