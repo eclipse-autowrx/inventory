@@ -1,18 +1,6 @@
-# Dependencies
 node_modules
-dist
-
-# Git
 .git
 .gitignore
-
-# Env
-.env
-.env.local
-.env.*.local
-
-# OS / Editor metadata
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
+kong.yml
+coverage
+.env*
