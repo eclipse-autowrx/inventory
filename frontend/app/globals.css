@@ -77,6 +77,35 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --da-primary-100: 196 28% 92%;
+  --da-primary-300: 198 28% 61%;
+  --da-primary-500: 198 100% 22%;
+
+  --da-secondary-100: 67 54% 92%;
+  --da-secondary-300: 67 54% 68%;
+  --da-secondary-500: 67 54% 48%;
+
+  --da-accent-100: 67 54% 92%;
+  --da-accent-300: 67 54% 68%;
+  --da-accent-500: 67 54% 48%;
+
+  --da-white: 0 0% 100%;
+  --da-black: 0 0% 0%;
+
+  /* Card background */
+  --da-gray-light: 214 32% 91%;
+  /* Text */
+  --da-gray-medium: 215 16% 47%;
+  /* Title */
+  --da-gray-dark: 215 13.8% 34.1%;
+  /* Background */
+  --da-gray-darkest: 217 33% 17%;
+
+  --da-destructive: 0 84% 60%;
+
+  --da-gradient-from: 198 100% 22%;
+  --da-gradient-to: 67 54% 48%;
 }
 
 .dark {
