@@ -6,8 +6,11 @@ services:
       - inventory-network
     depends_on:
       - backend
-      
+
   backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile
     platform: linux/amd64
     container_name: inventory-backend
     ports:
