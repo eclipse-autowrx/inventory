@@ -23,6 +23,7 @@ import { DaInput } from '@/components/atoms/DaInput';
 import { DaSelect, DaSelectItem } from '@/components/atoms/DaSelect';
 import { types, typeToImage } from '@/lib/mock/data';
 import useCurrentInventoryData from '@/hooks/useCurrentInventoryData';
+import { DaTextarea } from '@/components/atoms/DaTextarea';
 
 const tabs = [
   {
@@ -45,6 +46,11 @@ const tabs = [
 
 const General = ({ data: item }: { data: InventoryItem }) => {
   const [showDetail, setShowDetail] = useState(false);
+  const [showLinkElementForm, setShowLinkElementForm] = useState(false);
+  const [showLinkElementForm2, setShowLinkElementForm2] = useState(false);
+  const [elements, setElements] = useState<Set<string>>(new Set([]));
+  const params = useParams();
+  const id = params.slug?.at(0);
 
   const titleCase = (str: string) => {
     return str
@@ -113,7 +119,7 @@ const General = ({ data: item }: { data: InventoryItem }) => {
                 <div key={key} className="flex">
                   <DaText
                     variant="small"
-                    className="inline-block text-da-gray-dark w-[240px]"
+                    className="inline-block text-da-gray-dark min-w-[240px]"
                   >
                     {otherToTitleCase(key)}
                   </DaText>
@@ -229,6 +235,397 @@ const General = ({ data: item }: { data: InventoryItem }) => {
             )}
           </div>
         </div>
+
+        <div className="border-t border-t-da-gray-light/50 my-6" />
+        <DaText variant="regular-bold" className="text-da-gray-darkest">
+          Relationships
+        </DaText>
+        <div className="flex font-bold justify-between items-center px-4 py-2 border mt-2 bg-da-primary-500 rounded-md text-white">
+          {id === 'customer_journey_pw' && 'Contains Step'}
+          {id === 'step1_customer_journey' && 'Contains Flow Items'}
+          {id === 'flow1' && 'Contains System Activities'}
+          <DaButton
+            size="sm"
+            onClick={() => setShowLinkElementForm((prev) => !prev)}
+            variant="outline-nocolor"
+            className=""
+          >
+            Link An Element
+          </DaButton>
+        </div>
+
+        <div className="pl-10 pt-2">
+          {showLinkElementForm && (
+            <div className="p-5 space-y-3 rounded-md mb-2 shadow-medium">
+              <p className="font-medium">
+                Select {id === 'customer_journey_pw' && ' Step '}
+                {id === 'step1_customer_journey' && ' Flow Item '}
+                {id === 'flow1' && ' System Activity '}
+                Element
+              </p>
+              <div>
+                <p>
+                  {' '}
+                  {id === 'customer_journey_pw' && ' Step '}
+                  {id === 'flow1' && ' System Activity '}
+                  {id === 'step1_customer_journey' && ' Flow Item '} *
+                </p>
+                <DaSelect>
+                  {id === 'customer_journey_pw' && (
+                    <>
+                      <DaSelectItem
+                        className="!text-da-white hover:!bg-da-gray-dark !bg-da-gray-medium"
+                        value="add"
+                      >
+                        Create New Step Element
+                      </DaSelectItem>
+                      <DaSelectItem value="step-4">
+                        Step 4: the seat is adjusted according to user
+                        preferences
+                      </DaSelectItem>
+                      <DaSelectItem value="step-5">
+                        Step 5: basic settings are updated
+                      </DaSelectItem>
+                    </>
+                  )}
+                  {id === 'step1_customer_journey' && (
+                    <>
+                      <DaSelectItem
+                        className="!text-da-white hover:!bg-da-gray-dark !bg-da-gray-medium"
+                        value="add"
+                      >
+                        Create New Flow Item Element
+                      </DaSelectItem>
+                      <DaSelectItem value="step-4">Flow Item 1</DaSelectItem>
+                    </>
+                  )}
+                  {id === 'flow1' && (
+                    <>
+                      <DaSelectItem
+                        className="!text-da-white hover:!bg-da-gray-dark !bg-da-gray-medium"
+                        value="add"
+                      >
+                        Create New System Activity Element
+                      </DaSelectItem>
+                      <DaSelectItem value="1">
+                        Initialize Proximity Sensors; these will be used by open
+                        door
+                      </DaSelectItem>
+                      <DaSelectItem value="2">Start Monitoring</DaSelectItem>
+                      <DaSelectItem value="3">Driver in Proximity</DaSelectItem>
+                      <DaSelectItem value="4">
+                        Process Proximity Data
+                      </DaSelectItem>
+                      <DaSelectItem value="5">Distance Reading</DaSelectItem>
+                    </>
+                  )}
+                </DaSelect>
+              </div>
+              <div>
+                <p>Description</p>
+                <DaTextarea
+                  textareaClassName="!border-da-gray-light"
+                  className="!border-da-gray-light"
+                />
+              </div>
+
+              <div>
+                <p>Metadata</p>
+                <DaTextarea
+                  textareaClassName="!border-da-gray-light"
+                  className="!border-da-gray-light"
+                />
+              </div>
+
+              <div className="mt-2 gap-3 flex justify-end">
+                <DaButton
+                  onClick={() => setShowLinkElementForm(false)}
+                  size="sm"
+                  variant="text"
+                >
+                  Cancel
+                </DaButton>
+                <DaButton size="sm" variant="text">
+                  Save & Link Another
+                </DaButton>
+                <DaButton
+                  onClick={() => {
+                    setElements((prev) => {
+                      const newSet = new Set(prev);
+
+                      if (id === 'customer_journey_pw') {
+                        if (!newSet.has('step-4')) {
+                          newSet.add('step-4');
+                        } else {
+                          newSet.add('step-5');
+                        }
+                      }
+
+                      if (id === 'step1_customer_journey') {
+                        if (!newSet.has('flow-1')) {
+                          newSet.add('flow-1');
+                        } else {
+                          newSet.add('flow-2');
+                        }
+                      }
+
+                      if (id === 'flow1') {
+                        newSet.add('activity-2');
+                      }
+
+                      return newSet;
+                    });
+                    setShowLinkElementForm(false);
+                  }}
+                  size="sm"
+                  className="w-20"
+                >
+                  Save
+                </DaButton>
+              </div>
+            </div>
+          )}
+          {id === 'customer_journey_pw' && (
+            <>
+              <div className="px-2 py-3 flex items-center font-medium hover:bg-da-gray-light rounded-md">
+                <Link
+                  className="hover:underline"
+                  href={
+                    '/role/SDV%20Feature%20Owner/instance/step1_customer_journey'
+                  }
+                >
+                  Step 1: driver proximity detected
+                </Link>
+              </div>
+              <div className="border-t" />
+              <div className="px-2 py-3 flex items-center font-medium hover:bg-da-gray-light rounded-md">
+                <Link
+                  className="hover:underline"
+                  href={
+                    '/role/SDV%20Feature%20Owner/instance/step1_customer_journey'
+                  }
+                >
+                  Step 2: vehicle door is opened
+                </Link>
+              </div>
+
+              <div className="border-t" />
+              <div className="px-2 py-3 flex items-center font-medium hover:bg-da-gray-light rounded-md">
+                <Link
+                  className="hover:underline"
+                  href={
+                    '/role/SDV%20Feature%20Owner/instance/step1_customer_journey'
+                  }
+                >
+                  Step 3: personalized ambient light sequence is played
+                </Link>
+              </div>
+            </>
+          )}
+
+          {elements.has('step-4') && (
+            <>
+              <div className="border-t" />
+              <div className="px-2 py-3 flex items-center font-medium hover:bg-da-gray-light rounded-md">
+                <Link
+                  className="hover:underline"
+                  href={
+                    '/role/SDV%20Feature%20Owner/instance/step1_customer_journey'
+                  }
+                >
+                  Step 4: the seat is adjusted according to user preferences
+                </Link>
+              </div>
+            </>
+          )}
+          {elements.has('step-5') && (
+            <>
+              <div className="border-t" />
+              <div className="px-2 py-3 flex items-center font-medium hover:bg-da-gray-light rounded-md">
+                <Link
+                  className="hover:underline"
+                  href={
+                    '/role/SDV%20Feature%20Owner/instance/step1_customer_journey'
+                  }
+                >
+                  Step 5: basic settings are updated
+                </Link>
+              </div>
+            </>
+          )}
+
+          {elements.has('flow-1') && (
+            <>
+              <div className="px-2 py-3 flex items-center font-medium hover:bg-da-gray-light rounded-md">
+                <Link
+                  className="hover:underline"
+                  href={'/role/SDV%20Feature%20Owner/instance/flow1'}
+                >
+                  Flow Item 1
+                </Link>
+              </div>
+            </>
+          )}
+
+          {id === 'flow1' && (
+            <div className="flex text-smalls font-bold px-2 gap-[450px]">
+              <p>Name</p>
+              <p>Metadata</p>
+            </div>
+          )}
+
+          {id === 'flow1' && (
+            <>
+              <div className="px-2 py-3 flex items-center font-medium hover:bg-da-gray-light rounded-md">
+                <Link
+                  className="hover:underline w-[400px]"
+                  href={'/role/SDV%20Feature%20Owner/instance/activity1'}
+                >
+                  Initialize Proximity Sensors; these will be used by open door
+                </Link>
+                <p className="ml-[86px]">{'{type:embedded}'}</p>
+              </div>
+            </>
+          )}
+
+          {elements.has('activity-2') && (
+            <>
+              <div className="border-t" />
+              <div className="px-2 py-3 flex items-center font-medium hover:bg-da-gray-light rounded-md">
+                <Link
+                  className="hover:underline w-[400px]"
+                  href={'/role/SDV%20Feature%20Owner/instance/activity1'}
+                >
+                  Start Monitoring
+                </Link>
+                <p className="ml-[86px]">{'{type:Sensors/Actuators}'}</p>
+              </div>
+            </>
+          )}
+        </div>
+
+        {id === 'flow1' && (
+          <div>
+            <div className="flex font-bold justify-between items-center px-4 py-2 border mt-2 bg-da-primary-500 rounded-md text-white">
+              Contains System Interfaces
+              <DaButton
+                size="sm"
+                onClick={() => setShowLinkElementForm2((prev) => !prev)}
+                variant="outline-nocolor"
+                className=""
+              >
+                Link An Element
+              </DaButton>
+            </div>
+            <div className="pl-10 pt-2">
+              {showLinkElementForm2 && (
+                <div className="p-5 space-y-3 rounded-md mb-2 shadow-medium">
+                  <p className="font-medium">Select System Interface Element</p>
+                  <div>
+                    <p>System Interface *</p>
+                    <DaSelect>
+                      <DaSelectItem
+                        className="!text-da-white hover:!bg-da-gray-dark !bg-da-gray-medium"
+                        value="0"
+                      >
+                        Create New System Interface Element
+                      </DaSelectItem>
+                      <DaSelectItem value="1">
+                        Vehicle.ADAS.Proximity.Front.IsActive
+                      </DaSelectItem>
+                      <DaSelectItem value="2">
+                        Vehicle.ADAS.Proximity.Front.Distance
+                      </DaSelectItem>
+                      <DaSelectItem value="3">
+                        Vehicle.ADAS.Proximity.Front.IsWarning
+                      </DaSelectItem>
+                      <DaSelectItem value="4">
+                        Driver Access Permission
+                      </DaSelectItem>
+                      <DaSelectItem value="5">Safety Check</DaSelectItem>
+                      <DaSelectItem value="6">Self-reference</DaSelectItem>
+                      <DaSelectItem value="7">
+                        Vehicle.Cabin.Door.Row1.DriverSide.IsUnlocked
+                      </DaSelectItem>
+                      <DaSelectItem value="8">OpenDoor</DaSelectItem>
+                    </DaSelect>
+                  </div>
+                  <div>
+                    <p>Description</p>
+                    <DaTextarea
+                      textareaClassName="!border-da-gray-light"
+                      className="!border-da-gray-light"
+                    />
+                  </div>
+
+                  <div>
+                    <p>Metadata</p>
+                    <DaTextarea
+                      textareaClassName="!border-da-gray-light"
+                      className="!border-da-gray-light"
+                    />
+                  </div>
+
+                  <div className="mt-2 gap-3 flex justify-end">
+                    <DaButton
+                      onClick={() => setShowLinkElementForm2(false)}
+                      size="sm"
+                      variant="text"
+                    >
+                      Cancel
+                    </DaButton>
+                    <DaButton size="sm" variant="text">
+                      Save & Link Another
+                    </DaButton>
+                    <DaButton
+                      onClick={() => {
+                        setElements((prev) => {
+                          const newSet = new Set(prev);
+
+                          if (!newSet.has('interface-1')) {
+                            newSet.add('interface-1');
+                          } else {
+                            newSet.add('interface-2');
+                          }
+
+                          return newSet;
+                        });
+                        setShowLinkElementForm2(false);
+                      }}
+                      size="sm"
+                      className="w-20"
+                    >
+                      Save
+                    </DaButton>
+                  </div>
+                </div>
+              )}
+
+              {elements.has('interface-1') && (
+                <div className="flex text-smalls font-bold px-2 gap-[450px]">
+                  <p>Name</p>
+                  <p>Metadata</p>
+                </div>
+              )}
+
+              {elements.has('interface-1') && (
+                <>
+                  <div className="px-2 py-3 flex items-center font-medium hover:bg-da-gray-light rounded-md">
+                    <Link
+                      className="hover:underline w-[400px]"
+                      href={'/role/SDV%20Feature%20Owner/instance/flow1'}
+                    >
+                      Start Monitoring
+                    </Link>
+                    <p className="ml-[86px]">
+                      {'{type: system-2-ecu; direction: bi-directional}'}
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
