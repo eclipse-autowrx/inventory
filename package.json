@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "repository": "git@github.com:tuan-hda/inventory.git",
   "author": "tuan-hda <anhtuan.hoangdinh@gmail.com>",
-  "license": "cc-by-4.0",
+  "license": "CC-BY-4.0",
   "scripts": {
     "lint": "yarn lint --prefix frontend && yarn lint --prefix backend",
     "format": "prettier --write 'frontend/**/*.{js,jsx,ts,tsx}' 'backend/**/*.{js,ts}'",
