@@ -12,12 +12,24 @@ services:
       context: backend
       dockerfile: Dockerfile
     platform: linux/amd64
+    depends_on:
+      - db
     container_name: inventory-backend
     ports:
       - "3001:3000"
+    networks:
+      - inventory-network
+  
+  db:
+    image: mongo:4.4.29-focal
+    container_name: inventory-db
     networks:
       - inventory-network
 
 networks:
   inventory-network:
     driver: bridge
+
+volumes:
+  dbdata:
+    driver: local 
