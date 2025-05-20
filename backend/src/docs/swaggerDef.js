@@ -13,14 +13,14 @@ const swaggerDef = {
   },
   servers: [
     {
-      url: `http://localhost:${config.port}/v2`,
+      url: `http://localhost:${config.port}/v1`,
     },
   ],
 };
 
 const options = {
   swaggerDefinition: swaggerDef,
-  apis: ['./src/routes/v2/*.js', './src/models/*.model.js'],
+  apis: ['src/routes/**/*.js', 'src/docs/*.yml'],
 };
 
 module.exports = options;

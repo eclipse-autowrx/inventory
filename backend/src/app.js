@@ -5,9 +5,6 @@ const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const cors = require('cors');
 const httpStatus = require('http-status');
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-const swaggerOptions = require('./docs/swaggerDef');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const routes = require('./routes/v1');
@@ -48,9 +45,7 @@ app.use(
 );
 app.options('*', cors());
 
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-app.use(routes);
+app.use('/v1', routes);
 
 // Setup proxy to other services
 

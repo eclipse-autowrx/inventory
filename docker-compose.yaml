@@ -16,10 +16,10 @@ services:
       - db
     container_name: inventory-backend
     ports:
-      - "3001:3000"
+      - '3001:3001'
     networks:
       - inventory-network
-  
+
   db:
     volumes:
       - dbdata:/data/db
@@ -34,4 +34,4 @@ networks:
 
 volumes:
   dbdata:
-    driver: local 
+    driver: local
