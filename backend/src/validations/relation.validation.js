@@ -1,23 +1,35 @@
 const Joi = require('joi');
 const { objectId } = require('./custom.validation');
 
+const CARDINALITIES = ['one-to-one', 'zero-to-one', 'one-to-many', 'zero-to-many'];
+
 const createRelation = {
   body: Joi.object().keys({
+    name: Joi.string().required().trim(),
+    is_core: Joi.boolean().default(false),
     type: Joi.string().required().trim(),
     description: Joi.string().trim().allow(''),
     source: Joi.string().custom(objectId).required(),
     target: Joi.string().custom(objectId).required(),
-    cardinality: Joi.string().valid('one-to-one', 'one-to-many', 'many-to-many'),
-    properties: Joi.any(),
+    source_cardinality: Joi.string().valid(...CARDINALITIES),
+    target_cardinality: Joi.string().valid(...CARDINALITIES),
+    source_role_name: Joi.string(),
+    target_role_name: Joi.string(),
+    metadata: Joi.any(),
   }),
 };
 
 const getRelations = {
   query: Joi.object().keys({
+    name: Joi.string(),
+    source_role_name: Joi.string(),
+    target_role_name: Joi.string(),
+    is_core: Joi.boolean(),
+    source_cardinality: Joi.string().valid(...CARDINALITIES),
+    target_cardinality: Joi.string().valid(...CARDINALITIES),
     type: Joi.string(),
     source: Joi.string().custom(objectId),
     target: Joi.string().custom(objectId),
-    cardinality: Joi.string().valid('one-to-one', 'one-to-many', 'many-to-many'),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
@@ -39,8 +51,13 @@ const updateRelation = {
     .keys({
       // Only description, cardinality, properties are updatable
       description: Joi.string().trim().allow(''),
-      cardinality: Joi.string().valid('one-to-one', 'one-to-many', 'many-to-many'),
-      properties: Joi.any(),
+      name: Joi.string().trim(),
+      is_core: Joi.boolean(),
+      source_cardinality: Joi.string().valid(...CARDINALITIES),
+      target_cardinality: Joi.string().valid(...CARDINALITIES),
+      source_role_name: Joi.string(),
+      target_role_name: Joi.string(),
+      metadata: Joi.any(),
     })
     .min(1),
 };

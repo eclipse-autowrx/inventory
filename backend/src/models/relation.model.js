@@ -5,6 +5,12 @@ const InstanceRelation = require('./instanceRelation.model');
 
 const relationSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      index: true,
+    },
     // Common types are: composition, association, inheritance. Default to be 'custom'
     type: {
       type: String,
@@ -32,13 +38,25 @@ const relationSchema = new mongoose.Schema(
       index: true,
     },
     // Optional: Cardinality of relation
-    cardinality: {
+    source_cardinality: {
       type: String,
-      trim: true,
-      enum: ['one-to-one', 'one-to-many', 'many-to-many'],
+      enum: ['one-to-one', 'zero-to-one', 'one-to-many', 'zero-to-many'],
     },
-    // Optional: Store constraints or properties about the relation type
-    properties: {
+    target_cardinality: {
+      type: String,
+      enum: ['one-to-one', 'zero-to-one', 'one-to-many', 'zero-to-many'],
+    },
+    source_role_name: {
+      type: String,
+    },
+    target_role_name: {
+      type: String,
+    },
+    is_core: {
+      type: Boolean,
+      default: false,
+    },
+    metadata: {
       type: mongoose.SchemaTypes.Mixed,
     },
     created_by: {

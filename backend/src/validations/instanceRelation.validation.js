@@ -7,6 +7,7 @@ const createInstanceRelation = {
     source: Joi.string().custom(objectId).required(),
     target: Joi.string().custom(objectId).required(),
     metadata: Joi.any(),
+    description: Joi.string().trim().allow(''),
   }),
 };
 
@@ -35,6 +36,7 @@ const updateInstanceRelation = {
     .keys({
       // Only metadata should be updatable
       metadata: Joi.any().required(), // Require metadata if updating
+      description: Joi.string().trim().allow(''),
     })
     .min(1),
 };

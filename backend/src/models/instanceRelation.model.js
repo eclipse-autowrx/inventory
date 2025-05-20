@@ -34,6 +34,10 @@ const instanceRelationSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    description: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true, // createdAt indicates when the link was established
