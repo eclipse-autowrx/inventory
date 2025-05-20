@@ -16,7 +16,7 @@ const getRelations = catchAsync(async (req, res) => {
     'target',
     'name',
     'source_role_name',
-    'source_target_name',
+    'target_role_name',
     'is_core',
     'source_cardinality',
     'target_cardinality',
