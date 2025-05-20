@@ -45,7 +45,7 @@ app.use(
 );
 app.options('*', cors());
 
-app.use(routes);
+app.use('/v1', routes);
 
 // Setup proxy to other services
 

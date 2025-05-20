@@ -1,44 +1,5 @@
 components:
   schemas:
-    User:
-      type: object
-      properties:
-        id:
-          type: string
-        email:
-          type: string
-          format: email
-        name:
-          type: string
-        role:
-          type: string
-          enum: [user, admin]
-      example:
-        id: 5ebac534954b54139806c112
-        email: fake@example.com
-        name: fake name
-        role: user
-
-    Token:
-      type: object
-      properties:
-        token:
-          type: string
-        expires:
-          type: string
-          format: date-time
-      example:
-        token: <sample_token>
-        expires: 2020-05-12T16:18:04.793Z
-
-    AuthTokens:
-      type: object
-      properties:
-        access:
-          $ref: '#/components/schemas/Token'
-        refresh:
-          $ref: '#/components/schemas/Token'
-
     Error:
       type: object
       properties:
@@ -47,7 +8,193 @@ components:
         message:
           type: string
 
+    Instance:
+      type: object
+      required:
+        - name
+        - schema
+        - data
+        - created_by
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the instance
+          format: objectId
+        name:
+          type: string
+          description: Name of the instance
+        schema:
+          type: string
+          format: objectId
+          description: Reference to the Schema this instance conforms to
+        data:
+          type: string
+          description: The actual data/object payload
+        created_by:
+          type: string
+          format: objectId
+          description: Reference to the User who created the instance
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the instance was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the instance was last updated
+
+    InstanceRelation:
+      type: object
+      required:
+        - relation
+        - source
+        - target
+        - created_by
+      properties:
+        _id:
+          type: string
+          format: objectId
+          description: Unique identifier for the instance relation
+        relation:
+          type: string
+          format: objectId
+          description: Reference to the Relation definition
+        source:
+          type: string
+          format: objectId
+          description: Reference to the source Instance
+        target:
+          type: string
+          format: objectId
+          description: Reference to the target Instance
+        metadata:
+          type: object
+          description: Optional metadata for the relationship
+        created_by:
+          type: string
+          format: objectId
+          description: Reference to the User who created the relation
+        description:
+          type: string
+          description: Optional description of the relation
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the relation was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the relation was last updated
+
+    Relation:
+      type: object
+      required:
+        - name
+        - type
+        - source
+        - target
+        - created_by
+      properties:
+        _id:
+          type: string
+          format: objectId
+          description: Unique identifier for the relation
+        name:
+          type: string
+          description: Name of the relation
+        type:
+          type: string
+          enum: ['composition', 'association', 'inheritance', 'custom']
+          default: 'custom'
+          description: Type of the relation
+        description:
+          type: string
+          description: Optional description of the relation
+        source:
+          type: string
+          format: objectId
+          description: Reference to the source Schema
+        target:
+          type: string
+          format: objectId
+          description: Reference to the target Schema
+        source_cardinality:
+          type: string
+          enum: ['one-to-one', 'zero-to-one', 'one-to-many', 'zero-to-many']
+          description: Cardinality of the source side
+        target_cardinality:
+          type: string
+          enum: ['one-to-one', 'zero-to-one', 'one-to-many', 'zero-to-many']
+          description: Cardinality of the target side
+        source_role_name:
+          type: string
+          description: Optional role name for the source
+        target_role_name:
+          type: string
+          description: Optional role name for the target
+        is_core:
+          type: boolean
+          default: false
+          description: Indicates if the relation is core
+        metadata:
+          type: object
+          description: Optional metadata for the relation
+        created_by:
+          type: string
+          format: objectId
+          description: Reference to the User who created the relation
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the relation was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the relation was last updated
+
+    Schema:
+      type: object
+      required:
+        - name
+        - schema_definition
+        - created_by
+      properties:
+        _id:
+          type: string
+          format: objectId
+          description: Unique identifier for the schema
+        name:
+          type: string
+          description: Name of the schema
+        description:
+          type: string
+          description: Optional description of the schema
+        schema_definition:
+          type: string
+          description: Definition of the schema
+        created_by:
+          type: string
+          format: objectId
+          description: Reference to the User who created the schema
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the schema was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the schema was last updated
+
   responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 400
+            message: Bad request
     DuplicateEmail:
       description: Email already taken
       content:
