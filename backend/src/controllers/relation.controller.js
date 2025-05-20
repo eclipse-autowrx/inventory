@@ -10,7 +10,17 @@ const createRelation = catchAsync(async (req, res) => {
 });
 
 const getRelations = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['type', 'source', 'target', 'cardinality']);
+  const filter = pick(req.query, [
+    'type',
+    'source',
+    'target',
+    'name',
+    'source_role_name',
+    'source_target_name',
+    'is_core',
+    'source_cardinality',
+    'target_cardinality',
+  ]);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const advanced = pick(req.query, ['search']);
   const result = await relationService.queryRelations(filter, options, advanced);

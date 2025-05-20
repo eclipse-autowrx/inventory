@@ -20,5 +20,3 @@ services:
       - .env.dev
     restart: no
     command: yarn dev
-
-

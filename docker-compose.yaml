@@ -21,6 +21,8 @@ services:
       - inventory-network
   
   db:
+    volumes:
+      - dbdata:/data/db
     image: mongo:4.4.29-focal
     container_name: inventory-db
     networks:

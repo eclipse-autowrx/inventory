@@ -5,7 +5,7 @@ const CARDINALITIES = ['one-to-one', 'zero-to-one', 'one-to-many', 'zero-to-many
 
 const createRelation = {
   body: Joi.object().keys({
-    relation_name: Joi.string().required().trim(),
+    name: Joi.string().required().trim(),
     is_core: Joi.boolean().default(false),
     type: Joi.string().required().trim(),
     description: Joi.string().trim().allow(''),
@@ -21,7 +21,7 @@ const createRelation = {
 
 const getRelations = {
   query: Joi.object().keys({
-    relation_name: Joi.string(),
+    name: Joi.string(),
     source_role_name: Joi.string(),
     target_role_name: Joi.string(),
     is_core: Joi.boolean(),
@@ -51,7 +51,7 @@ const updateRelation = {
     .keys({
       // Only description, cardinality, properties are updatable
       description: Joi.string().trim().allow(''),
-      relation_name: Joi.string().trim(),
+      name: Joi.string().trim(),
       is_core: Joi.boolean(),
       source_cardinality: Joi.string().valid(...CARDINALITIES),
       target_cardinality: Joi.string().valid(...CARDINALITIES),
