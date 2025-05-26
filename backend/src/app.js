@@ -7,7 +7,7 @@ const cors = require('cors');
 const httpStatus = require('http-status');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
-const routes = require('./routes/v1');
+const routes = require('./routes/v2');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
@@ -45,7 +45,7 @@ app.use(
 );
 app.options('*', cors());
 
-app.use('/v1', routes);
+app.use('/v2', routes);
 
 // Setup proxy to other services
 
