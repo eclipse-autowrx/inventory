@@ -10,26 +10,26 @@ const router = express.Router();
 
 const defaultRoutes = [
   {
-    path: '/schemas',
+    path: '/inventory/schemas',
     route: schemaRoute,
   },
   {
-    path: '/relations',
+    path: '/inventory/relations',
     route: relationRoute,
   },
   {
-    path: '/instances',
+    path: '/inventory/instances',
     route: instanceRoute,
   },
   {
-    path: '/instance-relations',
+    path: '/inventory/instance-relations',
     route: instanceRelationRoute,
   },
 ];
 
 const devRoutes = [
   {
-    path: '/docs',
+    path: '/inventory/docs',
     route: docsRoute,
   },
 ];
