@@ -3,14 +3,14 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile
-    image: ghcr.io/eclipse-autowrx/inventory-frontend:latest
+    image: boschvn/inventory-fe:latest
     # Serve through nginx of docker container
     ports:
-      - "3000:80"
+      - '3000:80'
     restart: always
 
   backend:
-    image: ghcr.io/eclipse-autowrx/inventory-backend:latest
+    image: boschvn/inventory-be:latest
     env_file:
       - .env
     restart: always
