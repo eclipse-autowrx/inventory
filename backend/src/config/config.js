@@ -11,6 +11,9 @@ const envVarsSchema = Joi.object()
     MONGODB_URL: Joi.string().required().description('Mongo DB url'),
     // CORS Settings
     CORS_ORIGIN: Joi.string().description('CORS regex'),
+    AUTHORIZATION_URL: Joi.string()
+      .default('http://playground-be:8080/v2/auth/authorize')
+      .description('Authorization service URL'),
   })
   .unknown();
 
@@ -41,8 +44,11 @@ const config = {
   constraints: {
     defaultPageSize: 100,
   },
-
-  services: {},
+  services: {
+    auth: {
+      authorizationUrl: envVars.AUTHORIZATION_URL,
+    },
+  },
 };
 
 module.exports = config;

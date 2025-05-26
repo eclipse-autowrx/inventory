@@ -10,6 +10,7 @@ const morgan = require('./config/morgan');
 const routes = require('./routes/v2');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
+const convertUserHeader = require('./middlewares/convertUserHeader');
 
 const app = express();
 
@@ -45,7 +46,7 @@ app.use(
 );
 app.options('*', cors());
 
-app.use('/v2', routes);
+app.use('/v2', convertUserHeader, routes);
 
 // Setup proxy to other services
 
