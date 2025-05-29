@@ -20,7 +20,7 @@
   },
   "rules": {
     "func-names": "warn",
-    "no-underscore-dangle": "warn",
+    "no-underscore-dangle": "off",
     "consistent-return": "warn",
     "jest/expect-expect": "warn",
     "security/detect-object-injection": "warn",

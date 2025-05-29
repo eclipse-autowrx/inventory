@@ -48,6 +48,9 @@ const config = {
     auth: {
       authorizationUrl: envVars.AUTHORIZATION_URL,
     },
+    user: {
+      url: 'http://playground-be:8080/v2/users',
+    },
   },
 };
 

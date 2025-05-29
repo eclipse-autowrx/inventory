@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile.dev
     # Serve through default port of nextjs application
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -16,7 +16,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
-    env_file:
-      - .env.dev
+    environment:
+      - MONGODB_URL=mongodb://db:27017/inventory
     restart: no
     command: yarn dev

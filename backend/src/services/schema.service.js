@@ -5,6 +5,7 @@ const ApiError = require('../utils/ApiError');
 const ParsedJsonPropertiesMongooseDecorator = require('../decorators/ParsedJsonPropertiesMongooseDecorator');
 const ParsedJsonPropertiesMongooseListDecorator = require('../decorators/ParsedJsonPropertiesMongooseListDecorator');
 const { buildMongoSearchFilter } = require('../utils/queryUtils');
+const InterservicePopulateDecorator = require('../decorators/InterservicePopulateDecorator');
 
 const ajv = new Ajv();
 
@@ -51,9 +52,12 @@ const createSchema = async (schemaBody, userId) => {
 const querySchemas = async (filter, options, advanced) => {
   const finalFilter = buildMongoSearchFilter(filter, advanced.search, ['name', 'description']);
   const schemas = await Schema.paginate(finalFilter, options);
+
+  schemas.results = await new InterservicePopulateDecorator(schemas.results).populate('created_by').getPopulatedDocs();
+
   schemas.results = new ParsedJsonPropertiesMongooseListDecorator(
     schemas.results,
-    'schema_definition'
+    'schema_definition',
   ).getParsedPropertiesDataList();
   return schemas;
 };
@@ -64,7 +68,7 @@ const querySchemas = async (filter, options, advanced) => {
  * @returns {Promise<Schema>}
  */
 const getSchemaById = async (id) => {
-  const schema = await Schema.findById(id).populate('created_by');
+  const schema = await new InterservicePopulateDecorator(Schema.findById(id)).populate('created_by').getSinglePopulatedDoc();
   if (!schema) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Schema not found');
   }

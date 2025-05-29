@@ -13,7 +13,6 @@ const getSchemas = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['name', 'created_by']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const advanced = pick(req.query, ['search']);
-  options.populate = ['created_by', 'name'];
   const result = await schemaService.querySchemas(filter, options, advanced);
   res.send(result);
 });
