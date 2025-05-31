@@ -3,6 +3,7 @@ const { Relation, Schema } = require('../models');
 const ApiError = require('../utils/ApiError');
 const ParsedJsonPropertiesMongooseDecorator = require('../decorators/ParsedJsonPropertiesMongooseDecorator');
 const { buildMongoSearchFilter } = require('../utils/queryUtils');
+const InterservicePopulateListDecorator = require('../decorators/InterservicePopulateDecorator');
 
 /**
  * Check if source and target schemas exist
@@ -70,15 +71,14 @@ const queryRelations = async (filter, options, advanced) => {
           path: 'target',
           select: 'name',
         },
-        {
-          path: 'created_by',
-          select: 'name image_file',
-        },
       ],
     ];
   }
   const finalFilter = buildMongoSearchFilter(filter, advanced.search, ['type', 'description', 'cardinality']);
   const relations = await Relation.paginate(finalFilter, finalOptions);
+  relations.results = await new InterservicePopulateListDecorator(relations.results)
+    .populate('created_by')
+    .getPopulatedDocs();
   return relations;
 };
 
@@ -88,18 +88,19 @@ const queryRelations = async (filter, options, advanced) => {
  * @returns {Promise<Relation>}
  */
 const getRelationById = async (id) => {
-  const relation = await Relation.findById(id)
-    .populate('source')
-    .populate('target')
-    .populate('created_by', 'name image_file');
+  const relation = await Relation.findById(id).populate('source').populate('target');
   if (!relation) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Relation not found');
   }
-  return new ParsedJsonPropertiesMongooseDecorator(
-    relation,
-    'source.schema_definition',
-    'target.schema_definition'
-  ).getParsedPropertiesData();
+  return new InterservicePopulateListDecorator(
+    new ParsedJsonPropertiesMongooseDecorator(
+      relation,
+      'source.schema_definition',
+      'target.schema_definition',
+    ).getParsedPropertiesData(),
+  )
+    .populate('created_by')
+    .getSinglePopulatedDoc();
 };
 
 /**
@@ -125,7 +126,7 @@ const updateRelationById = async (relationId, updateBody) => {
   if (updateBody.source || updateBody.target || updateBody.type) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      'Updating source, target, or type is not recommended. Delete and recreate if needed.'
+      'Updating source, target, or type is not recommended. Delete and recreate if needed.',
     );
   }
 

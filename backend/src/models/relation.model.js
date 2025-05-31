@@ -67,7 +67,7 @@ const relationSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Add index for common lookups & unique
