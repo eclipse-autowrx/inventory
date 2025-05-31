@@ -135,15 +135,17 @@ class InterservicePopulateListDecorator {
     const queryResults = new Map();
 
     idsToPopulate.forEach((ids, field) => {
-      promises.push(
-        userService.getUsers({ id: Array.from(ids).join(','), limit: 1000 }).then((data) => {
-          const mapData = data.reduce((acc, user) => {
-            acc.set(user.id, dataProjection(user, populateStages.get(field)));
-            return acc;
-          }, new Map());
-          queryResults.set(field, mapData);
-        }),
-      );
+      if (ids.size > 0) {
+        promises.push(
+          userService.getUsers({ id: Array.from(ids).join(','), limit: 1000 }).then((data) => {
+            const mapData = data.reduce((acc, user) => {
+              acc.set(user.id, dataProjection(user, populateStages.get(field)));
+              return acc;
+            }, new Map());
+            queryResults.set(field, mapData);
+          }),
+        );
+      }
     });
 
     // Execute all promises to fetch data for each populated field
