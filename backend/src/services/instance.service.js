@@ -105,9 +105,7 @@ const queryInstances = async (filter, options, advanced) => {
  * @returns {Promise<Instance>}
  */
 const getInstanceById = async (id) => {
-  const instance = await new InterservicePopulateListDecorator(Instance.findById(id))
-    .populate('created_by')
-    .getSinglePopulatedDoc();
+  const instance = await Instance.findById(id);
   if (!instance) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Instance not found');
   }
@@ -119,7 +117,11 @@ const getInstanceById = async (id) => {
 
   const parsedSchema = new ParsedJsonPropertiesMongooseDecorator(schema, 'schema_definition').getParsedPropertiesData();
   instance._doc.schema = parsedSchema;
-  return new ParsedJsonPropertiesMongooseDecorator(instance, 'data').getParsedPropertiesData();
+  return new InterservicePopulateListDecorator(
+    new ParsedJsonPropertiesMongooseDecorator(instance, 'data').getParsedPropertiesData(),
+  )
+    .populate('created_by')
+    .getSinglePopulatedDoc();
 };
 
 const isOwner = async (instanceId, userId) => {

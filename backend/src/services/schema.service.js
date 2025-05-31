@@ -68,11 +68,15 @@ const querySchemas = async (filter, options, advanced) => {
  * @returns {Promise<Schema>}
  */
 const getSchemaById = async (id) => {
-  const schema = await new InterservicePopulateDecorator(Schema.findById(id)).populate('created_by').getSinglePopulatedDoc();
+  const schema = await Schema.findById(id);
   if (!schema) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Schema not found');
   }
-  return new ParsedJsonPropertiesMongooseDecorator(schema, 'schema_definition').getParsedPropertiesData();
+  return new InterservicePopulateDecorator(
+    new ParsedJsonPropertiesMongooseDecorator(schema, 'schema_definition').getParsedPropertiesData(),
+  )
+    .populate('created_by')
+    .getSinglePopulatedDoc();
 };
 
 /**
