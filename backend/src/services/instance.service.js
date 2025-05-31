@@ -8,6 +8,7 @@ const schemaService = require('./schema.service');
 const ParsedJsonPropertiesMongooseDecorator = require('../decorators/ParsedJsonPropertiesMongooseDecorator');
 const ParsedJsonPropertiesMongooseListDecorator = require('../decorators/ParsedJsonPropertiesMongooseListDecorator');
 const { buildMongoSearchFilter } = require('../utils/queryUtils');
+const InterservicePopulateListDecorator = require('../decorators/InterservicePopulateDecorator');
 
 /**
  * Validate instance data against its schema definition
@@ -86,15 +87,14 @@ const queryInstances = async (filter, options, advanced) => {
           path: 'schema',
           select: 'name',
         },
-        {
-          path: 'created_by',
-          select: 'name image_file',
-        },
       ],
     ];
   }
   const finalFilter = buildMongoSearchFilter(filter, advanced.search, ['name']);
   const instances = await Instance.paginate(finalFilter, finalOptions);
+  instances.results = await new InterservicePopulateListDecorator(instances.results)
+    .populate('created_by')
+    .getPopulatedDocs();
   instances.results = new ParsedJsonPropertiesMongooseListDecorator(instances.results, 'data').getParsedPropertiesDataList();
   return instances;
 };
@@ -105,7 +105,9 @@ const queryInstances = async (filter, options, advanced) => {
  * @returns {Promise<Instance>}
  */
 const getInstanceById = async (id) => {
-  const instance = await Instance.findById(id).populate('created_by', 'name image_file'); // Populate schema name
+  const instance = await new InterservicePopulateListDecorator(Instance.findById(id))
+    .populate('created_by')
+    .getSinglePopulatedDoc();
   if (!instance) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Instance not found');
   }

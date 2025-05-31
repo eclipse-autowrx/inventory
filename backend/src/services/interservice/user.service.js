@@ -23,6 +23,13 @@ const config = require('../../config/config');
  * @returns {Promise<User[]>}
  */
 const getUsers = async (options) => {
+  return [
+    {
+      id: '6699fa83964f3f002f35ea78',
+      name: 'Jane Doe',
+      image_file: 'https://example.com/image.jpg',
+    },
+  ];
   const response = await axios.get(config.services.user.url, {
     params: options,
   });

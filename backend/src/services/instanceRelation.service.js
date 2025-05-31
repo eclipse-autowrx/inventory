@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const { InstanceRelation, Relation, Instance } = require('../models');
 const ApiError = require('../utils/ApiError');
 const ParsedJsonPropertiesMongooseDecorator = require('../decorators/ParsedJsonPropertiesMongooseDecorator');
+const InterservicePopulateListDecorator = require('../decorators/InterservicePopulateDecorator');
 
 /**
  * Validate the compatibility of source/target instances with the relation definition
@@ -9,22 +10,12 @@ const ParsedJsonPropertiesMongooseDecorator = require('../decorators/ParsedJsonP
  * @param {ObjectId} sourceInstanceId
  * @param {ObjectId} targetInstanceId
  */
-const validateRelationCompatibility = async (relationId, sourceInstanceId, targetInstanceId) => {
-  const [relation, sourceInstance, targetInstance] = await Promise.all([
-    Relation.findById(relationId).populate('source', 'name').populate('target', 'name'),
-    Instance.findById(sourceInstanceId).populate('schema', 'name'),
-    Instance.findById(targetInstanceId).populate('schema', 'name'),
-  ]);
-
-  if (!relation) throw new ApiError(httpStatus.BAD_REQUEST, `Relation with id ${relationId} not found.`);
-  if (!sourceInstance) throw new ApiError(httpStatus.BAD_REQUEST, `Source instance with id ${sourceInstanceId} not found.`);
-  if (!targetInstance) throw new ApiError(httpStatus.BAD_REQUEST, `Target instance with id ${targetInstanceId} not found.`);
-
+const validateRelationCompatibility = async (relation, sourceInstance, targetInstance) => {
   // Check if source instance's schema matches relation's source schema
   if (sourceInstance.schema._id.toString() !== relation.source._id.toString()) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      `Source instance's schema (${sourceInstance.schema}) does not match relation's defined source schema (${relation.source})`
+      `Source instance's schema (${sourceInstance.schema}) does not match relation's defined source schema (${relation.source})`,
     );
   }
 
@@ -32,7 +23,7 @@ const validateRelationCompatibility = async (relationId, sourceInstanceId, targe
   if (targetInstance.schema._id.toString() !== relation.target._id.toString()) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      `Target instance's schema (${targetInstance.schema}) does not match relation's defined target schema (${relation.target})`
+      `Target instance's schema (${targetInstance.schema}) does not match relation's defined target schema (${relation.target})`,
     );
   }
 
@@ -46,20 +37,58 @@ const validateRelationCompatibility = async (relationId, sourceInstanceId, targe
  * @returns {Promise<InstanceRelation>}
  */
 const createInstanceRelation = async (body, userId) => {
-  // 1. Validate compatibility
-  await validateRelationCompatibility(body.relation, body.source, body.target);
+  const { relation: relationId, source: sourceInstanceId, target: targetInstanceId } = body;
 
-  // Optional: Check for duplicates if the same relation between the same instances shouldn't exist twice
-  const existing = await InstanceRelation.findOne({
-    relation: body.relation,
-    source: body.source,
-    target: body.target,
+  const [relation, sourceInstance, targetInstance] = await Promise.all([
+    Relation.findById(relationId).populate('source', 'name').populate('target', 'name'),
+    Instance.findById(sourceInstanceId).populate('schema', 'name'),
+    Instance.findById(targetInstanceId).populate('schema', 'name'),
+  ]);
+
+  if (!relation) throw new ApiError(httpStatus.BAD_REQUEST, `Relation with id ${relationId} not found.`);
+  if (!sourceInstance) throw new ApiError(httpStatus.BAD_REQUEST, `Source instance with id ${sourceInstanceId} not found.`);
+  if (!targetInstance) throw new ApiError(httpStatus.BAD_REQUEST, `Target instance with id ${targetInstanceId} not found.`);
+
+  // Validate compatibility
+  await validateRelationCompatibility(relation, sourceInstance, targetInstance);
+
+  // Validate exact existing instance relation
+  const existingInstanceRelations = await InstanceRelation.find({
+    relation: relationId,
   });
-  if (existing) {
+  if (
+    existingInstanceRelations.some(
+      (ir) => String(ir.source) === String(sourceInstanceId) && String(ir.target) === String(targetInstanceId),
+    )
+  ) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'This exact relation between these instances already exists.');
   }
 
-  // 2. Create the instance relation
+  // Validate source and target cardinality
+  const { source_cardinality: sourceCardinality, target_cardinality: targetCardinality } = relation;
+  const singleCardinalityTypes = ['one-to-one', 'zero-to-one'];
+
+  if (
+    singleCardinalityTypes.includes(sourceCardinality) &&
+    existingInstanceRelations.some((ir) => String(ir.target) === String(targetInstanceId))
+  ) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `Cannot create this instance relation: violates source cardinality (${sourceCardinality}).`,
+    );
+  }
+
+  if (
+    singleCardinalityTypes.includes(targetCardinality) &&
+    existingInstanceRelations.some((ir) => String(ir.source) === String(sourceInstanceId))
+  ) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `Cannot create this instance relation: violates target cardinality (${targetCardinality}).`,
+    );
+  }
+
+  // Create the instance relation
   const instanceRelation = await InstanceRelation.create({
     ...body,
     created_by: userId,
@@ -81,13 +110,15 @@ const queryInstanceRelations = async (filter, options) => {
     finalOptions.populate = [
       [
         { path: 'relation', select: 'type source target' },
-        { path: 'source', select: 'schema' },
-        { path: 'target', select: 'schema' },
-        { path: 'created_by', select: 'name image_file' },
+        { path: 'source', select: 'schema name' },
+        { path: 'target', select: 'schema name' },
       ],
     ];
   }
   const instanceRelations = await InstanceRelation.paginate(filter, finalOptions);
+  instanceRelations.results = await new InterservicePopulateListDecorator(instanceRelations.results)
+    .populate('created_by')
+    .getPopulatedDocs();
   return instanceRelations;
 };
 
