@@ -4,10 +4,15 @@ import { roles } from '@/lib/mock/data';
 import { TbListTree } from 'react-icons/tb';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getServerSession } from '@/lib/auth/server-session-auth';
 
-export default function InventoryRoleBrowser() {
+export default async function InventoryRoleBrowser() {
+  const session = await getServerSession();
+
   return (
     <div className="container py-4">
+      {session?.email}
+
       <div className="flex-1 min-w-0 flex gap-2">
         <DaText variant="title" className="text-da-primary-500">
           Role Browser
@@ -33,7 +38,7 @@ export default function InventoryRoleBrowser() {
             <Image
               width={200}
               height={200}
-              className="h-full aspect-square rounded-l-md"
+              className="h-full w-auto aspect-square rounded-l-md"
               src={role.image}
               alt={role.name}
             />
