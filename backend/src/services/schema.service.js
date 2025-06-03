@@ -86,7 +86,7 @@ const getSchemaById = async (id) => {
  */
 const isOwner = async (schemaId, userId) => {
   const schema = await getSchemaById(schemaId);
-  return String(schema.created_by?._id) === String(userId);
+  return String(schema.created_by?.id) === String(userId);
 };
 
 /**

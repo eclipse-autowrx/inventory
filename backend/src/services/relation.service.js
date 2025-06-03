@@ -110,7 +110,7 @@ const getRelationById = async (id) => {
  */
 const isOwner = async (relationId, userId) => {
   const relation = await getRelationById(relationId);
-  return String(relation.created_by?._id) === String(userId);
+  return String(relation.created_by?.id) === String(userId);
 };
 
 /**

@@ -126,7 +126,7 @@ const getInstanceById = async (id) => {
 
 const isOwner = async (instanceId, userId) => {
   const instance = await getInstanceById(instanceId);
-  return String(instance.created_by?._id) === String(userId);
+  return String(instance.created_by?.id) === String(userId);
 };
 
 /**
