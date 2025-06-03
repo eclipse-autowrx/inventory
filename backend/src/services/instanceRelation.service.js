@@ -143,7 +143,7 @@ const getInstanceRelationById = async (id) => {
  */
 const isOwner = async (instanceRelationId, userId) => {
   const instanceRelation = await getInstanceRelationById(instanceRelationId);
-  return String(instanceRelation.created_by?._id) === String(userId);
+  return String(instanceRelation.created_by?.id) === String(userId);
 };
 
 /**
