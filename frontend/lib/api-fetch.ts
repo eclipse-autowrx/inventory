@@ -1,13 +1,12 @@
-type CustomRequestInit = Omit<RequestInit, 'body'> & {
-  body?: {
-    [key: string | number | symbol]: unknown;
-  };
-};
+import { CustomRequestInit } from '@/types/common.type';
 
-export default function apiFetch(url: string, options: CustomRequestInit = {}) {
+export function apiFetch(url: string, options: CustomRequestInit = {}) {
+  const { parseAsJson = true } = options;
+
   return fetch(url, {
     ...options,
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body:
+      options.body && parseAsJson ? JSON.stringify(options.body) : undefined,
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,

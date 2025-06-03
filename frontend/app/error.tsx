@@ -20,6 +20,7 @@ export default function Error({
       <div className="m-auto flex h-full flex-col items-center justify-center">
         <TbExclamationCircle className="text-3xl text-da-primary-500" />
         <p className="da-label-title mt-3">Oops! Something went wrong.</p>
+        <p className="da-da-label-small mt-3">{error.message}</p>
         <DaButton size="sm" className="mt-3" onClick={reset}>
           Try again
         </DaButton>
