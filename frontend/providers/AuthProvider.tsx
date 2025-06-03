@@ -1,46 +1,33 @@
 'use client';
 
-import apiFetch from '@/lib/api-fetch';
+import { signIn, signOut } from '@/services/auth.service';
+import { useSessionStore } from '@/stores/session-store';
 import { useCallback, useEffect } from 'react';
 
 export default function AuthProvider() {
-  const signIn = useCallback(async (userToken: string) => {
-    const response = await apiFetch('/api/auth/signin', {
-      method: 'POST',
-      body: {
-        token: userToken,
-      },
-    });
+  const { setSession, clearSession } = useSessionStore();
 
-    if (!response.ok) {
-      console.warn('Failed to sign in with user token');
-      return;
-    }
-
-    const { needRefresh = true } = await response.json();
-    if (needRefresh) {
-      window.location.href = window.location.href;
-    }
-  }, []);
+  const signInHandler = useCallback(
+    async (userToken: string) => {
+      const user = await signIn(userToken);
+      setSession(user);
+    },
+    [setSession]
+  );
 
   const handleReceiveUserToken = useCallback(
     async (event: MessageEvent) => {
       if (event.data?.type === 'userToken') {
         const userToken = event.data?.token;
         if (userToken) {
-          signIn(userToken);
+          signInHandler(userToken);
         } else {
-          const res = await apiFetch('/api/auth/signout', {
-            method: 'POST',
-          });
-          const { needRefresh } = await res.json();
-          if (needRefresh) {
-            window.location.href = window.location.href;
-          }
+          await signOut();
+          clearSession();
         }
       }
     },
-    [signIn]
+    [clearSession, signInHandler]
   );
 
   useEffect(() => {
