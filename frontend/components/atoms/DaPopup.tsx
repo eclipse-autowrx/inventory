@@ -1,3 +1,5 @@
+'use client';
+
 import React, { Fragment, forwardRef, useState } from 'react';
 import Modal from '@mui/material/Modal';
 import clsx from 'clsx';
