@@ -45,6 +45,7 @@ export function decode(token?: string): Session | undefined {
     });
     return session as Session;
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    return undefined;
   }
 }
