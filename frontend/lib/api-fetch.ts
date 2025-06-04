@@ -6,7 +6,11 @@ export function apiFetch(url: string, options: CustomRequestInit = {}) {
   return fetch(url, {
     ...options,
     body:
-      options.body && parseAsJson ? JSON.stringify(options.body) : options.body,
+      options.body && parseAsJson
+        ? JSON.stringify(options.body)
+        : typeof options.body === 'string'
+          ? options.body
+          : undefined,
     headers: {
       ...(parseAsJson ? { 'Content-Type': 'application/json' } : {}),
       ...options.headers,
