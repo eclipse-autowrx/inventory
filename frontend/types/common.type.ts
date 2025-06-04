@@ -23,3 +23,8 @@ export type Partner = {
     url: string;
   }[];
 };
+
+export type CustomRequestInit = Omit<RequestInit, 'body'> & {
+  body?: unknown;
+  parseAsJson?: boolean;
+};

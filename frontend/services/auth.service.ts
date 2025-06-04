@@ -1,10 +1,11 @@
 'use server';
 
 import { apiConfig } from '@/configs/api';
-import apiFetch from '@/lib/api-fetch';
+import { apiFetch } from '@/lib/api-fetch';
 import { SESSION_COOKIE_MAX_AGE, SESSION_COOKIE_NAME } from '@/lib/auth/helper';
 import { encode } from '@/lib/auth/server-session-auth';
 import { Session } from '@/types/session.type';
+import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
 export async function signIn(token: string) {
@@ -47,6 +48,9 @@ export async function signIn(token: string) {
       sameSite: 'lax',
       path: '/',
     });
+
+    revalidatePath('/schema', 'page');
+    revalidatePath('/schema/[pages]', 'page');
 
     return user;
   } catch (error) {

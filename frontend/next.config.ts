@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [new URL('https://bewebstudio.digitalauto.tech/**')],
   },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
 };
 
 export default nextConfig;
