@@ -6,6 +6,8 @@ services:
       - inventory-network
     depends_on:
       - backend
+    env_file:
+      - .env.fe
 
   backend:
     build:
