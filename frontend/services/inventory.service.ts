@@ -213,5 +213,5 @@ export async function deleteInventoryInstance(instanceId: string) {
     throw new Error(errorData.message || 'Failed to delete instance');
   }
 
-  revalidatePath('/inventory/instance', 'page');
+  revalidatePath('/instance', 'page');
 }
