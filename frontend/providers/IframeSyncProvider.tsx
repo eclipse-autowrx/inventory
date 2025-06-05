@@ -40,7 +40,7 @@ export default function IframeSyncProvider() {
         const url = new URL(route, window.location.origin);
         if (
           url.pathname !== pathname ||
-          url.search !== searchParams.toString()
+          url.search?.replace('?', '') !== searchParams.toString()
         ) {
           router.push(`${url.pathname}${url.search}`);
         }
@@ -57,7 +57,7 @@ export default function IframeSyncProvider() {
     window.parent?.postMessage(
       {
         type: 'syncRoute',
-        route: pathname + search,
+        route: `${pathname}?${search}`,
       },
       '*'
     );

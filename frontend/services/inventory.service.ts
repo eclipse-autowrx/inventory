@@ -4,6 +4,11 @@ import { apiConfig } from '@/configs/api';
 import { attachAuthApiFetch } from '@/lib/attach-auth-api-fetch';
 import { List } from '@/types/common.type';
 import {
+  InventoryInstance,
+  InventoryInstanceCreatePayload,
+  InventoryInstanceDetail,
+  InventoryInstanceFormData,
+  InventoryInstanceUpdatePayload,
   InventorySchema,
   InventorySchemaFormData,
 } from '@/types/inventory.type';
@@ -94,4 +99,119 @@ export async function deleteInventorySchema(schemaId: string) {
   }
 
   revalidatePath('/schema', 'page');
+}
+
+export async function getInventoryInstance(id: string) {
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/instances/${id}`,
+    {
+      method: 'GET',
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to fetch instance:', errorData);
+    throw new Error(errorData.message || 'Failed to fetch instance');
+  }
+
+  return res.json() as Promise<InventoryInstanceDetail>;
+}
+
+export async function getInventoryInstances(searchParams?: string) {
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/instances${
+      searchParams ? `?${searchParams}` : ''
+    }`,
+    {
+      method: 'GET',
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to fetch instances:', errorData);
+    throw new Error(errorData.message || 'Failed to fetch instances');
+  }
+
+  return res.json() as Promise<List<InventoryInstance>>;
+}
+
+export async function createInventoryInstance(
+  schemaId: string,
+  formData: InventoryInstanceFormData
+) {
+  const payload: InventoryInstanceCreatePayload = {
+    ...formData,
+    data: JSON.stringify(formData.data),
+    schema: schemaId,
+  };
+
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/instances`,
+    {
+      method: 'POST',
+      body: payload,
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to create instance:', errorData);
+    throw new Error(errorData.message || 'Failed to create instance');
+  }
+
+  revalidatePath('/instance', 'page');
+  return res.json() as Promise<InventoryInstance>;
+}
+
+export async function updateInventoryInstance(
+  instanceId: string,
+  formData: InventoryInstanceFormData
+) {
+  const payload: InventoryInstanceUpdatePayload = {
+    ...formData,
+    ...(formData.data && {
+      data: JSON.stringify(formData.data),
+    }),
+  };
+
+  if (!payload.data) {
+    delete payload.data;
+  }
+
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/instances/${instanceId}`,
+    {
+      method: 'PATCH',
+      body: payload,
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to update instance:', errorData);
+    throw new Error(errorData.message || 'Failed to update instance');
+  }
+
+  revalidatePath('/instance', 'page');
+  revalidatePath(`/instance/${instanceId}`, 'page');
+  return res.json() as Promise<InventoryInstance>;
+}
+
+export async function deleteInventoryInstance(instanceId: string) {
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/instances/${instanceId}`,
+    {
+      method: 'DELETE',
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to delete instance:', errorData);
+    throw new Error(errorData.message || 'Failed to delete instance');
+  }
+
+  revalidatePath('/instance', 'page');
 }

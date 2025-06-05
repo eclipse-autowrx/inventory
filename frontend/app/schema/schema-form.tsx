@@ -212,8 +212,9 @@ const InventorySchemaForm: React.FC<SchemaFormProps> = ({
       <div className="flex-1 min-w-0">
         {/* Schema Definition Field (Textarea) */}
         <CodeEditorWithSize
+          language="json"
           onBlur={onSchemaDefinitionBlur}
-          onChange={onSchemaDefinitionChange}
+          setCode={onSchemaDefinitionChange}
           code={schemaDefinitionValue}
           loading={loading}
           title={

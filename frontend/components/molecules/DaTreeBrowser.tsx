@@ -89,7 +89,7 @@ const TreeNode = ({
       >
         <button
           className={clsx(
-            'w-5 mr-2',
+            'min-w-5 mr-2',
             node.children &&
               'border hover:bg-da-primary-100 transition rounded-full flex items-center justify-center'
           )}
@@ -108,7 +108,7 @@ const TreeNode = ({
               onSelected?.(node);
             }}
             className={clsx(
-              'hover:underline',
+              'hover:underline text-left',
               selected === node.id && 'font-bold underline'
             )}
             style={{

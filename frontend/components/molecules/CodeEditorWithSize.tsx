@@ -2,12 +2,9 @@
 
 import { useState } from 'react';
 import { DaSelect, DaSelectItem } from '../atoms/DaSelect';
-import CodeEditor from './CodeEditor';
+import CodeEditor, { CodeEditorProps } from './CodeEditor';
 
-interface CodeEditorWithSizeProps {
-  code: string;
-  onChange: (value: string) => void;
-  onBlur: () => void;
+interface CodeEditorWithSizeProps extends CodeEditorProps {
   loading?: boolean;
   title?: React.ReactNode;
 }
@@ -15,7 +12,7 @@ interface CodeEditorWithSizeProps {
 export default function CodeEditorWithSize({
   code,
   onBlur,
-  onChange,
+  setCode,
   loading,
   title,
 }: CodeEditorWithSizeProps) {
@@ -67,7 +64,7 @@ export default function CodeEditorWithSize({
           fontSize={Number(fontSize)}
           code={code}
           onBlur={onBlur}
-          setCode={onChange}
+          setCode={setCode}
           editable={!loading}
         />
       </div>
