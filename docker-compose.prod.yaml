@@ -6,7 +6,7 @@ services:
     image: boschvn/inventory-fe:latest
     # Serve through nginx of docker container
     ports:
-      - '3000:80'
+      - '3000:3000'
     restart: always
 
   backend:

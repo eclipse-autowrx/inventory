@@ -4,9 +4,9 @@ import { signIn, signOut } from '@/services/auth.service';
 import { useSessionStore } from '@/stores/session-store';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect } from 'react';
+import { Suspense, useCallback, useEffect } from 'react';
 
-export default function IframeSyncProvider() {
+function InnerIframeSyncProvider() {
   const { setSession, clearSession } = useSessionStore();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -76,4 +76,12 @@ export default function IframeSyncProvider() {
   }, [handleMessageFromParent]);
 
   return null;
+}
+
+export default function IframeSyncProvider() {
+  return (
+    <Suspense>
+      <InnerIframeSyncProvider />
+    </Suspense>
+  );
 }

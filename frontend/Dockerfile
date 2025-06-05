@@ -1,14 +1,18 @@
 # Stage 1: Build the React app with Node.js
-FROM node:20-alpine AS builder
+FROM node:20-alpine AS base
+
+FROM base AS builder
 
 # Set the working directory in the container
+RUN apk add --no-cache libc6-compat
+
 WORKDIR /app
 
 # Copy the package.json and yarn.lock files to the working directory
 COPY package.json yarn.lock ./
 
 # Install the project dependencies
-RUN yarn install
+RUN yarn --frozen-lockfile
 
 # Copy the rest of the project files to the working directory
 COPY . .
@@ -16,20 +20,28 @@ COPY . .
 # Build the project
 RUN yarn build
 
-# Stage 2: Serve the app with Nginx
-FROM nginx:alpine
+# Stage 2: Serve the app 
+FROM base AS runner
 
 WORKDIR /app
 
-# Copy the build output to the Nginx html directory
-COPY --from=builder /app/.next /usr/share/nginx/html/.next
-COPY --from=builder /app/public /usr/share/nginx/html/public
+ENV NODE_ENV=production
 
-# Copy custom Nginx configuration file
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+RUN addgroup --system --gid 1001 nodejs 
+RUN adduser --system --uid 1001 nextjs
+
+# Copy the build output to the Nginx html directory
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
 
 # Expose port 80
-EXPOSE 80
+EXPOSE 3000
 
 # Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+ENV PORT=3000
+
+ENV HOSTNAME="0.0.0.0"
+CMD ["node", "server.js"]
