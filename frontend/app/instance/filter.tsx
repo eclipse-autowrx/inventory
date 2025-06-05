@@ -97,7 +97,7 @@ function InnerFilter({ schemaList }: FilterProps) {
           wrapperClassName="!rounded-lg"
           Icon={TbSearch}
           onChange={(e) => handleSearchChange(e.target.value)}
-          placeholder="Search Inventory Item"
+          placeholder="Search Instance Item"
         />
         {/* Show clear button only if there is text in the input */}
         {searchString && (
