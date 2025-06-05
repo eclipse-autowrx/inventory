@@ -4,13 +4,10 @@ import { roles } from '@/lib/mock/data';
 import { TbListTree } from 'react-icons/tb';
 import Link from 'next/link';
 import Image from 'next/image';
-import { EmailDisplay } from './email-display';
 
 export default async function InventoryRoleBrowser() {
   return (
     <div className="container py-4">
-      <EmailDisplay />
-
       <div className="flex-1 min-w-0 flex gap-2">
         <DaText variant="title" className="text-da-primary-500">
           Role Browser
