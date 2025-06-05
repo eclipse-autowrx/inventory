@@ -42,7 +42,7 @@ export default function IframeSyncProvider() {
           url.pathname !== pathname ||
           url.search?.replace('?', '') !== searchParams.toString()
         ) {
-          router.push(`${url.pathname}?${url.search}`);
+          router.push(`${url.pathname}${url.search}`);
         }
       }
     },
