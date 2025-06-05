@@ -2,6 +2,7 @@
 
 import { DaButton } from '@/components/atoms/DaButton';
 import { DaInput } from '@/components/atoms/DaInput';
+import DaLoading from '@/components/atoms/DaLoading';
 import DaText from '@/components/atoms/DaText';
 import DaTreeBrowser, { Node } from '@/components/molecules/DaTreeBrowser';
 import { List } from '@/types/common.type';
@@ -9,14 +10,14 @@ import { InventorySchema } from '@/types/inventory.type';
 import clsx from 'clsx';
 import { debounce } from 'lodash';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { TbSearch, TbX } from 'react-icons/tb';
 
 interface FilterProps {
   schemaList: List<InventorySchema>;
 }
 
-export default function Filter({ schemaList }: FilterProps) {
+function InnerFilter({ schemaList }: FilterProps) {
   const [searchString, setSearchString] = useState('');
   const searchParams = useSearchParams();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -140,5 +141,13 @@ export default function Filter({ schemaList }: FilterProps) {
         />
       </div>
     </div>
+  );
+}
+
+export default function Filter(props: FilterProps) {
+  return (
+    <Suspense fallback={<DaLoading />}>
+      <InnerFilter {...props} />
+    </Suspense>
   );
 }

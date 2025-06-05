@@ -22,7 +22,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Fragment } from 'react/jsx-runtime';
 import DaTreeBrowser, { Node } from '@/components/molecules/DaTreeBrowser';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   instanceRelations,
   instances,
@@ -219,7 +219,7 @@ type InventoryItemListProps = {
   mode?: 'view' | 'select';
 };
 
-const InventoryItemList = ({ mode = 'view' }: InventoryItemListProps) => {
+const InnerInventoryItemList = ({ mode = 'view' }: InventoryItemListProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { roleName: roleParam } = useParams();
@@ -359,6 +359,14 @@ const InventoryItemList = ({ mode = 'view' }: InventoryItemListProps) => {
         ))}
       </div>
     </div>
+  );
+};
+
+const InventoryItemList = (props: InventoryItemListProps) => {
+  return (
+    <Suspense fallback={<DaLoading />}>
+      <InnerInventoryItemList {...props} />
+    </Suspense>
   );
 };
 
