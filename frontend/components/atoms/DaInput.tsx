@@ -69,8 +69,6 @@ const DaInput = React.forwardRef<HTMLInputElement, InputProps>(
 
           <input
             type={type}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
             className={cn(
               `grow flex px-2 py-1 h-8 w-full
                 placeholder:text-da-gray-300
@@ -80,6 +78,8 @@ const DaInput = React.forwardRef<HTMLInputElement, InputProps>(
             )}
             ref={ref}
             {...props}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
           />
 
           {Icon && !iconBefore && (

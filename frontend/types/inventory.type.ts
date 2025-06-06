@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { User } from './user.type';
+import { SimplifiedUser, User } from './user.type';
 
 export type CreateInventoryItem = {
   type: string;
@@ -82,3 +82,41 @@ export type InventoryInstanceUpdatePayload = Partial<
     data?: string;
   }
 >;
+
+type InventorySimplifiedSchema = {
+  id: string;
+  name: string;
+};
+
+type Cardinality =
+  | 'one-to-one'
+  | 'zero-to-one'
+  | 'one-to-many'
+  | 'many-to-many';
+
+export interface InventoryRelation {
+  id: string;
+  name: string;
+  type: string;
+  description?: string;
+  source: InventorySimplifiedSchema;
+  source_cardinality?: Cardinality;
+  source_role_name?: string;
+  target: InventorySimplifiedSchema;
+  target_cardinality?: Cardinality;
+  target_role_name?: string;
+  is_core?: boolean;
+  metadata?: Record<string, any>;
+  created_by?: SimplifiedUser;
+}
+
+export interface InventoryRelationFormData {
+  name: string;
+  type: string;
+  source: string;
+  target: string;
+  source_role_name?: string;
+  target_role_name?: string;
+  source_cardinality?: string;
+  target_cardinality?: string;
+}

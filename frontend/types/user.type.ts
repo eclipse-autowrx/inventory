@@ -15,6 +15,12 @@ export type UserCreate = {
   password: string;
 };
 
+export type SimplifiedUser = {
+  id: string;
+  name: string;
+  image_file?: string;
+};
+
 export type User = Omit<UserCreate, 'password'> & {
   roles: Roles;
   email_verified: boolean;

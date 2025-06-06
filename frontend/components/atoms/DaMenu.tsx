@@ -1,3 +1,5 @@
+'use client';
+
 import { Menu } from '@mui/material';
 import { FC, useState } from 'react';
 
