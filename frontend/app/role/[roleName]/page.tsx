@@ -402,7 +402,7 @@ const InventoryItem = ({ data: item }: InventoryItemProps) => {
         </object>
       </div>
       <div className="flex-1 flex flex-col min-w-0 truncate">
-        <Link href={`/role/${role}/instance/${item.id}`} className="w-fit">
+        <Link href={`/role/${role}/item/${item.id}`} className="w-fit">
           <DaText
             variant="regular-bold"
             className="hover:underline text-da-gray-darkest !block"

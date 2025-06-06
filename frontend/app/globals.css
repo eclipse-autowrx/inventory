@@ -108,6 +108,10 @@
   --da-gradient-to: 67 54% 48%;
 }
 
+body {
+  font-family: 'Manrope', sans-serif;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
