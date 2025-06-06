@@ -9,6 +9,7 @@ import {
   InventoryInstanceDetail,
   InventoryInstanceFormData,
   InventoryInstanceUpdatePayload,
+  InventoryRelation,
   InventorySchema,
   InventorySchemaFormData,
 } from '@/types/inventory.type';
@@ -214,4 +215,56 @@ export async function deleteInventoryInstance(instanceId: string) {
   }
 
   revalidatePath('/instance', 'page');
+}
+
+interface GetInventoryRelationsParams {
+  source?: string;
+  target?: string;
+}
+
+export async function getInventoryRelations(
+  params?: GetInventoryRelationsParams
+): Promise<List<InventoryRelation>> {
+  return {
+    results: [
+      {
+        id: '123',
+        name: 'Sample Relation',
+        source: {
+          id: 'source-schema-id',
+          name: 'Source Schema',
+        },
+        target: {
+          id: 'target-instance-id',
+          name: 'Target Schema',
+        },
+        type: 'association',
+      },
+    ],
+    totalPages: 1,
+    totalResults: 10,
+    limit: 10,
+    page: 1,
+  };
+
+  const searchParams = new URLSearchParams(
+    params as Record<string, string> | undefined
+  );
+
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/relations${
+      searchParams.size === 0 ? '' : `?${searchParams.toString()}`
+    }`,
+    {
+      method: 'GET',
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to fetch relations:', errorData);
+    throw new Error(errorData.message || 'Failed to fetch relations');
+  }
+
+  return res.json();
 }
