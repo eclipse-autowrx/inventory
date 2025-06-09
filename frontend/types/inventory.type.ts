@@ -92,7 +92,8 @@ type Cardinality =
   | 'one-to-one'
   | 'zero-to-one'
   | 'one-to-many'
-  | 'many-to-many';
+  | 'many-to-many'
+  | 'zero-to-many';
 
 export interface InventoryRelation {
   id: string;
