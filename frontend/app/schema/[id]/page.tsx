@@ -15,6 +15,7 @@ import {
 import { List } from '@/types/common.type';
 import RelationItem from './(relation)/relation-item';
 import DeleteRelation from './(relation)/delete-relation';
+import { Fragment } from 'react';
 
 interface PageSchemaDetailProps {
   params: {
@@ -82,7 +83,7 @@ export default async function PageSchemaDetail({
           </pre>
         </div>
 
-        <div className="mt-6 border-t flex gap-1 flex-col pt-4 text-sm text-gray-500">
+        <div className="mt-6 border-y flex gap-1 flex-col py-4 text-sm text-gray-500">
           <div className="flex gap-1 items-center">
             Created By:{' '}
             {schema.created_by ? (
@@ -102,7 +103,7 @@ export default async function PageSchemaDetail({
         <div className="mt-6">
           <DaText variant="regular-bold">Relations</DaText>
 
-          <RelationForm currentSchemaId={schema.id} className="-mt-7" />
+          <RelationForm schemaId={schema.id} className="-mt-7" />
 
           <RelationList schemaId={id} />
         </div>
@@ -127,6 +128,9 @@ async function RelationList({ schemaId }: RelationListProps) {
         target: schemaId,
       }),
     ]);
+    incomingRelations.results = incomingRelations.results.filter(
+      (relation) => relation.source.id !== relation.target.id
+    );
   } catch (error) {
     console.error('Error fetching relations:', error);
     return (
@@ -151,68 +155,67 @@ async function RelationList({ schemaId }: RelationListProps) {
 
   return (
     <div className="mt-7">
-      <DaText variant="small-bold" className="text-da-gray-darkest">
-        Outgoing Relations ({outgoingRelations.totalResults})
-      </DaText>
-      <div className="rounded-xl mt-3 space-y-5 p-7 bg-white border">
-        <div className="flex gap-6 items-center w-full justify-between">
-          <div className="max-w-[800px] flex-1">
-            <RelationItem />
-          </div>
-          <div className="flex">
-            <DaButton size="sm" variant="plain">
-              <TbPencil className="mr-2" /> Edit
-            </DaButton>
-            <DeleteRelation />
-          </div>
-        </div>
+      {outgoingRelations.results.length > 0 && (
+        <>
+          <DaText variant="small-bold" className="text-da-gray-darkest">
+            Outgoing Relations ({outgoingRelations.totalResults})
+          </DaText>
+          <div className="rounded-xl mt-3 space-y-5 p-7 bg-white border">
+            {outgoingRelations.results.map((relation, index) => (
+              <Fragment key={relation.id}>
+                <div className="flex gap-6 items-center w-full justify-between">
+                  <div className="max-w-[800px] flex-1">
+                    <RelationItem relation={relation} />
+                  </div>
+                  <div className="flex">
+                    <DaButton size="sm" variant="plain">
+                      <TbPencil className="mr-2" /> Edit
+                    </DaButton>
+                    <DeleteRelation />
+                  </div>
+                </div>
 
-        <div className="border-t" />
+                {index < outgoingRelations.results.length - 1 && (
+                  <div className="border-t" />
+                )}
+              </Fragment>
+            ))}
+          </div>
+        </>
+      )}
 
-        <div className="flex gap-6 items-center w-full justify-between">
-          <div className="max-w-[800px] flex-1">
-            <RelationItem />
-          </div>
-          <div className="flex">
-            <DaButton size="sm" variant="plain">
-              <TbPencil className="mr-2" /> Edit
-            </DaButton>
-            <DeleteRelation />
-          </div>
-        </div>
-      </div>
+      {incomingRelations.results.length > 0 && (
+        <>
+          <DaText
+            variant="small-bold"
+            className="block mt-7 text-da-gray-darkest"
+          >
+            Incoming Relations ({incomingRelations.results.length})
+          </DaText>
 
-      <DaText variant="small-bold" className="block mt-7 text-da-gray-darkest">
-        Incoming Relations ({incomingRelations.totalResults})
-      </DaText>
+          <div className="rounded-xl mt-3 space-y-5 p-7 bg-white border">
+            {incomingRelations.results.map((relation, index) => (
+              <Fragment key={relation.id}>
+                <div className="flex gap-6 items-center w-full justify-between">
+                  <div className="max-w-[800px] flex-1">
+                    <RelationItem reverseDirection relation={relation} />
+                  </div>
+                  <div className="flex">
+                    <DaButton size="sm" variant="plain">
+                      <TbPencil className="mr-2" /> Edit
+                    </DaButton>
+                    <DeleteRelation />
+                  </div>
+                </div>
 
-      <div className="rounded-xl mt-3 space-y-5 p-7 bg-white border">
-        <div className="flex gap-6 items-center w-full justify-between">
-          <div className="max-w-[800px] flex-1">
-            <RelationItem />
+                {index < incomingRelations.results.length - 1 && (
+                  <div className="border-t" />
+                )}
+              </Fragment>
+            ))}
           </div>
-          <div className="flex">
-            <DaButton size="sm" variant="plain">
-              <TbPencil className="mr-2" /> Edit
-            </DaButton>
-            <DeleteRelation />
-          </div>
-        </div>
-
-        <div className="border-t" />
-
-        <div className="flex gap-6 items-center w-full justify-between">
-          <div className="max-w-[800px] flex-1">
-            <RelationItem />
-          </div>
-          <div className="flex">
-            <DaButton size="sm" variant="plain">
-              <TbPencil className="mr-2" /> Edit
-            </DaButton>
-            <DeleteRelation />
-          </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

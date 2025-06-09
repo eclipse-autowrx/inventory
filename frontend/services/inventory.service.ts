@@ -241,34 +241,13 @@ export async function createInventoryRelation(data: InventoryRelationFormData) {
     throw new Error(errorData.message || 'Failed to create relation');
   }
 
+  revalidatePath('/schema', 'page');
   return res.json() as Promise<InventoryRelation>;
 }
 
 export async function getInventoryRelations(
   params?: GetInventoryRelationsParams
 ): Promise<List<InventoryRelation>> {
-  return {
-    results: [
-      {
-        id: '123',
-        name: 'Sample Relation',
-        source: {
-          id: 'source-schema-id',
-          name: 'Source Schema',
-        },
-        target: {
-          id: 'target-instance-id',
-          name: 'Target Schema',
-        },
-        type: 'association',
-      },
-    ],
-    totalPages: 1,
-    totalResults: 10,
-    limit: 10,
-    page: 1,
-  };
-
   const searchParams = new URLSearchParams(
     params as Record<string, string> | undefined
   );
