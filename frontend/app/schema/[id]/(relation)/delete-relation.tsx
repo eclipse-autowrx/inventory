@@ -3,16 +3,32 @@
 import { DaButton } from '@/components/atoms/DaButton';
 import DaPopup from '@/components/atoms/DaPopup';
 import DaText from '@/components/atoms/DaText';
+import { deleteInventoryRelation } from '@/services/inventory.service';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { TbLoader, TbTrash } from 'react-icons/tb';
 
-export default function DeleteRelation() {
-  const [loading, setLoading] = useState(false);
+interface DeleteRelationProps {
+  relationId: string;
+  relationName?: string;
+}
+
+export default function DeleteRelation({
+  relationId,
+  relationName,
+}: DeleteRelationProps) {
   const open = useState(false);
 
-  const handleDelete = () => {
-    setLoading(true);
-  };
+  const deleteRelationMutation = useMutation({
+    mutationFn: () => deleteInventoryRelation(relationId),
+    onSuccess() {
+      open[1](false);
+    },
+    onError(error) {
+      console.error('Failed to delete relation:', error);
+    },
+  });
+
   return (
     <DaPopup
       state={open}
@@ -24,7 +40,7 @@ export default function DeleteRelation() {
     >
       <div className="w-[500px] flex flex-col gap-2 max-w-[90vw]">
         <DaText variant="sub-title" className="text-da-primary-500">
-          Delete Relation
+          Delete Relation &quot;{relationName || relationId}&quot;
         </DaText>
 
         <DaText variant="small">
@@ -38,12 +54,18 @@ export default function DeleteRelation() {
             onClick={() => open[1](false)}
             size="sm"
             variant="outline-nocolor"
-            disabled={loading}
+            disabled={deleteRelationMutation.isPending}
           >
             Cancel
           </DaButton>
-          <DaButton disabled={loading} onClick={handleDelete} size="sm">
-            {loading && <TbLoader className="mr-1 animate-spin" />}
+          <DaButton
+            disabled={deleteRelationMutation.isPending}
+            onClick={() => deleteRelationMutation.mutate()}
+            size="sm"
+          >
+            {deleteRelationMutation.isPending && (
+              <TbLoader className="mr-1 animate-spin" />
+            )}
             Delete
           </DaButton>
         </div>

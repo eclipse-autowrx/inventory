@@ -171,7 +171,10 @@ async function RelationList({ schemaId }: RelationListProps) {
                     <DaButton size="sm" variant="plain">
                       <TbPencil className="mr-2" /> Edit
                     </DaButton>
-                    <DeleteRelation />
+                    <DeleteRelation
+                      relationId={relation.id}
+                      relationName={relation.name}
+                    />
                   </div>
                 </div>
 
@@ -204,7 +207,10 @@ async function RelationList({ schemaId }: RelationListProps) {
                     <DaButton size="sm" variant="plain">
                       <TbPencil className="mr-2" /> Edit
                     </DaButton>
-                    <DeleteRelation />
+                    <DeleteRelation
+                      relationId={relation.id}
+                      relationName={relation.name}
+                    />
                   </div>
                 </div>
 
