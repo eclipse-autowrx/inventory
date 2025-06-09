@@ -16,7 +16,7 @@ import DaLoader from '@/components/atoms/DaLoader';
 
 interface RelationFormProps {
   className?: string;
-  currentSchemaId: string;
+  schemaId: string;
 }
 
 const defaultValues: InventoryRelationFormData = {
@@ -32,7 +32,7 @@ const defaultValues: InventoryRelationFormData = {
 
 export default function RelationForm({
   className,
-  currentSchemaId,
+  schemaId,
 }: RelationFormProps) {
   const [showForm, setShowForm] = useState(false);
   const [anchor, setAnchor] = useState<'source' | 'target'>('source');
@@ -62,7 +62,7 @@ export default function RelationForm({
       }
       reset({
         ...defaultValues,
-        source: currentSchemaId,
+        source: schemaId,
       });
     },
     onSettled: () => {
@@ -71,13 +71,13 @@ export default function RelationForm({
   });
 
   useEffect(() => {
-    if (currentSchemaId && getValues().source !== currentSchemaId) {
+    if (schemaId && getValues().source !== schemaId) {
       reset((prev) => ({
         ...prev,
-        source: currentSchemaId,
+        source: schemaId,
       }));
     }
-  }, [currentSchemaId, getValues, reset]);
+  }, [schemaId, getValues, reset]);
 
   const {
     field: { value: typeValue, onChange: typeOnChange },
@@ -404,17 +404,19 @@ export default function RelationForm({
               }}
               variant="outline-nocolor"
             >
-              {createRelationMutation.isPending && (
-                <DaLoader className="mr-2 !text-base" />
-              )}
+              {createRelationMutation.isPending &&
+                showFormAfterSubmit.current && (
+                  <DaLoader className="mr-2 !text-base" />
+                )}
               <DaText variant="small" className="text-da-gray-dark">
                 Save & Add New
               </DaText>
             </DaButton>
             <DaButton>
-              {createRelationMutation.isPending && (
-                <DaLoader className="mr-2 !text-base" />
-              )}
+              {createRelationMutation.isPending &&
+                !showFormAfterSubmit.current && (
+                  <DaLoader className="mr-2 !text-white !text-base" />
+                )}
               <DaText variant="small">Save</DaText>
             </DaButton>
           </div>

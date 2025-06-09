@@ -88,23 +88,24 @@ type InventorySimplifiedSchema = {
   name: string;
 };
 
-type Cardinality =
+type RelationType = 'association' | 'inheritance' | 'composition';
+
+export type RelationCardinality =
   | 'one-to-one'
   | 'zero-to-one'
   | 'one-to-many'
-  | 'many-to-many'
   | 'zero-to-many';
 
 export interface InventoryRelation {
   id: string;
   name: string;
-  type: string;
+  type: RelationType;
   description?: string;
   source: InventorySimplifiedSchema;
-  source_cardinality?: Cardinality;
+  source_cardinality?: RelationCardinality;
   source_role_name?: string;
   target: InventorySimplifiedSchema;
-  target_cardinality?: Cardinality;
+  target_cardinality?: RelationCardinality;
   target_role_name?: string;
   is_core?: boolean;
   metadata?: Record<string, any>;
