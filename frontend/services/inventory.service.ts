@@ -10,6 +10,7 @@ import {
   InventoryInstanceFormData,
   InventoryInstanceUpdatePayload,
   InventoryRelation,
+  InventoryRelationFormData,
   InventorySchema,
   InventorySchemaFormData,
 } from '@/types/inventory.type';
@@ -220,6 +221,27 @@ export async function deleteInventoryInstance(instanceId: string) {
 interface GetInventoryRelationsParams {
   source?: string;
   target?: string;
+}
+
+export async function createInventoryRelation(data: InventoryRelationFormData) {
+  const payload = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => Boolean(v))
+  );
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/relations`,
+    {
+      method: 'POST',
+      body: payload,
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to create relation:', errorData);
+    throw new Error(errorData.message || 'Failed to create relation');
+  }
+
+  return res.json() as Promise<InventoryRelation>;
 }
 
 export async function getInventoryRelations(
