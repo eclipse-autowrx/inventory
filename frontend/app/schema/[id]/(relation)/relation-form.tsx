@@ -3,20 +3,31 @@
 import { DaButton } from '@/components/atoms/DaButton';
 import { DaInput } from '@/components/atoms/DaInput';
 import DaText from '@/components/atoms/DaText';
-import { InventoryRelationFormData } from '@/types/inventory.type';
+import {
+  InventoryRelation,
+  InventoryRelationFormData,
+} from '@/types/inventory.type';
 import clsx from 'clsx';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useController, useForm } from 'react-hook-form';
-import { TbArrowsLeftRight, TbPlus } from 'react-icons/tb';
+import { TbArrowsLeftRight } from 'react-icons/tb';
 import SchemaCombobox from './schema-combobox';
 import { DaSelect, DaSelectItem } from '@/components/atoms/DaSelect';
 import { useMutation } from '@tanstack/react-query';
-import { createInventoryRelation } from '@/services/inventory.service';
+import {
+  createInventoryRelation,
+  updateInventoryRelation,
+} from '@/services/inventory.service';
 import DaLoader from '@/components/atoms/DaLoader';
 
 interface RelationFormProps {
   className?: string;
   schemaId: string;
+  trigger: React.ReactNode;
+  triggerWrapperClassName?: string;
+  onFormClose?: () => void;
+  isUpdating?: boolean;
+  initialData?: InventoryRelation;
 }
 
 const defaultValues: InventoryRelationFormData = {
@@ -33,6 +44,11 @@ const defaultValues: InventoryRelationFormData = {
 export default function RelationForm({
   className,
   schemaId,
+  trigger,
+  triggerWrapperClassName,
+  onFormClose,
+  isUpdating,
+  initialData,
 }: RelationFormProps) {
   const [showForm, setShowForm] = useState(false);
   const [anchor, setAnchor] = useState<'source' | 'target'>('source');
@@ -47,14 +63,29 @@ export default function RelationForm({
     setValue,
     reset,
   } = useForm<InventoryRelationFormData>({
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      source: schemaId,
+    },
   });
 
-  const createRelationMutation = useMutation({
+  const relationMutation = useMutation({
     mutationFn: async (data: InventoryRelationFormData) => {
-      if (data.source_cardinality === 'n/a') delete data.source_cardinality;
-      if (data.target_cardinality === 'n/a') delete data.target_cardinality;
-      return createInventoryRelation(data);
+      if (data.source_cardinality === 'n/a') data.source_cardinality = '';
+      if (data.target_cardinality === 'n/a') data.target_cardinality = '';
+      if (!isUpdating) {
+        return createInventoryRelation(data);
+      }
+
+      const updatedData: Partial<InventoryRelationFormData> = {
+        ...data,
+      };
+      delete updatedData.source;
+      delete updatedData.target;
+      if (!initialData) {
+        throw new Error('Initial data is required for updating relation.');
+      }
+      return updateInventoryRelation(initialData.id, updatedData);
     },
     onSuccess: () => {
       if (!showFormAfterSubmit.current) {
@@ -64,6 +95,8 @@ export default function RelationForm({
         ...defaultValues,
         source: schemaId,
       });
+      setAnchor('source');
+      onFormClose?.();
     },
     onSettled: () => {
       showFormAfterSubmit.current = false;
@@ -71,13 +104,28 @@ export default function RelationForm({
   });
 
   useEffect(() => {
-    if (schemaId && getValues().source !== schemaId) {
-      reset((prev) => ({
-        ...prev,
-        source: schemaId,
-      }));
+    if (initialData) {
+      reset({
+        name: initialData.name,
+        type: initialData.type,
+        source: initialData.source.id,
+        target: initialData.target.id,
+        source_role_name:
+          initialData.source_role_name || defaultValues.source_role_name,
+        target_role_name:
+          initialData.target_role_name || defaultValues.target_role_name,
+        source_cardinality:
+          initialData.source_cardinality || defaultValues.source_cardinality,
+        target_cardinality:
+          initialData.target_cardinality || defaultValues.target_cardinality,
+      });
+      if (initialData.source.id === schemaId) {
+        setAnchor('source');
+      } else if (initialData.target.id === schemaId) {
+        setAnchor('target');
+      }
     }
-  }, [schemaId, getValues, reset]);
+  }, [initialData, reset, schemaId]);
 
   const {
     field: { value: typeValue, onChange: typeOnChange },
@@ -127,7 +175,7 @@ export default function RelationForm({
   });
 
   const onSubmit = async (data: InventoryRelationFormData) => {
-    createRelationMutation.mutate(data);
+    relationMutation.mutate(data);
   };
 
   const swapSourceTarget = () => {
@@ -151,16 +199,14 @@ export default function RelationForm({
   };
 
   return (
-    <div className={clsx(className)}>
+    <div className={className}>
       <div className="w-full flex">
-        <DaButton
-          onClick={() => setShowForm((prev) => !prev)}
-          size="sm"
-          className="ml-auto"
-          variant="outline-nocolor"
+        <div
+          className={triggerWrapperClassName}
+          onClick={() => setShowForm(true)}
         >
-          <TbPlus className="mr-1" /> Add Relation
-        </DaButton>
+          {trigger}
+        </div>
       </div>
 
       {showForm && (
@@ -169,11 +215,13 @@ export default function RelationForm({
           className="shadow-small bg-white rounded-xl mt-2 p-8"
         >
           <DaText variant="regular-bold" className="text-da-gray-dark">
-            Add Relation
+            {!isUpdating
+              ? 'Add Relation'
+              : `Update Relation "${initialData?.name}"`}
           </DaText>
-          {createRelationMutation.isError && (
+          {relationMutation.isError && (
             <div className="border rounded-lg text-sm text-da-destructive border-da-destructive p-4 my-7">
-              {createRelationMutation.error?.message ||
+              {relationMutation.error?.message ||
                 'An error occurred while creating the relation.'}
             </div>
           )}
@@ -186,7 +234,7 @@ export default function RelationForm({
               {...register('name', {
                 required: 'Relation Name is required.',
               })}
-              disabled={createRelationMutation.isPending}
+              disabled={relationMutation.isPending}
               className="mt-3"
               inputClassName="text-sm"
               placeholder="Enter Relation Name..."
@@ -211,7 +259,7 @@ export default function RelationForm({
                   'flex-1',
                   typeValue !== 'association' && 'opacity-60'
                 )}
-                disabled={createRelationMutation.isPending}
+                disabled={relationMutation.isPending}
                 variant={typeValue === 'association' ? 'outline' : 'dash'}
               >
                 <DaText variant="small">Association</DaText>
@@ -223,7 +271,7 @@ export default function RelationForm({
                   'flex-1',
                   typeValue !== 'composition' && 'opacity-60'
                 )}
-                disabled={createRelationMutation.isPending}
+                disabled={relationMutation.isPending}
                 variant={typeValue === 'composition' ? 'outline' : 'dash'}
               >
                 <DaText variant="small">Composition</DaText>
@@ -235,7 +283,7 @@ export default function RelationForm({
                   'flex-1',
                   typeValue !== 'inheritance' && 'opacity-60'
                 )}
-                disabled={createRelationMutation.isPending}
+                disabled={relationMutation.isPending}
                 variant={typeValue === 'inheritance' ? 'outline' : 'dash'}
               >
                 <DaText variant="small">Inheritance</DaText>
@@ -252,14 +300,18 @@ export default function RelationForm({
                 value={sourceValue}
                 onChange={sourceOnChange}
                 disabled={
-                  createRelationMutation.isPending || anchor === 'source'
+                  relationMutation.isPending ||
+                  anchor === 'source' ||
+                  isUpdating
                 }
                 className="mt-3"
                 placeholder="Search for Source Schema..."
                 tooltipText={
-                  anchor === 'source'
-                    ? 'Fixed to current schema (use swap button to change relationship direction)'
-                    : undefined
+                  isUpdating
+                    ? 'Cannot change source during update. Delete and create a new relation instead.'
+                    : anchor === 'source'
+                      ? 'Fixed to current schema (use swap button to change relationship direction)'
+                      : undefined
                 }
               />
               {errors.source && (
@@ -276,7 +328,7 @@ export default function RelationForm({
               </DaText>
               <DaInput
                 {...register('source_role_name')}
-                disabled={createRelationMutation.isPending}
+                disabled={relationMutation.isPending}
                 className="mt-3"
                 inputClassName="text-sm"
                 placeholder="Enter Source Role Name..."
@@ -328,12 +380,16 @@ export default function RelationForm({
                 value={targetValue}
                 onChange={targetOnChange}
                 disabled={
-                  createRelationMutation.isPending || anchor === 'target'
+                  relationMutation.isPending ||
+                  anchor === 'target' ||
+                  isUpdating
                 }
                 tooltipText={
-                  anchor === 'target'
-                    ? 'Fixed to current schema (use swap button to change relationship direction)'
-                    : undefined
+                  isUpdating
+                    ? 'Cannot change target during update. Delete and create a new relation instead.'
+                    : anchor === 'target'
+                      ? 'Fixed to current schema (use swap button to change relationship direction)'
+                      : undefined
                 }
                 className="mt-3"
                 placeholder="Search for Target Schema..."
@@ -354,7 +410,7 @@ export default function RelationForm({
                 {...register('target_role_name')}
                 className="mt-3"
                 inputClassName="text-sm"
-                disabled={createRelationMutation.isPending}
+                disabled={relationMutation.isPending}
                 placeholder="Enter Target Role Name..."
               />
 
@@ -390,7 +446,10 @@ export default function RelationForm({
 
           <div className="mt-7 flex items-center justify-end gap-3">
             <DaButton
-              onClick={() => setShowForm(false)}
+              onClick={() => {
+                setShowForm(false);
+                onFormClose?.();
+              }}
               variant="outline-nocolor"
               type="button"
             >
@@ -398,25 +457,25 @@ export default function RelationForm({
                 Cancel
               </DaText>
             </DaButton>
-            <DaButton
-              onClick={() => {
-                showFormAfterSubmit.current = true;
-              }}
-              variant="outline-nocolor"
-            >
-              {createRelationMutation.isPending &&
-                showFormAfterSubmit.current && (
+            {!isUpdating && (
+              <DaButton
+                onClick={() => {
+                  showFormAfterSubmit.current = true;
+                }}
+                variant="outline-nocolor"
+              >
+                {relationMutation.isPending && showFormAfterSubmit.current && (
                   <DaLoader className="mr-2 !text-base" />
                 )}
-              <DaText variant="small" className="text-da-gray-dark">
-                Save & Add New
-              </DaText>
-            </DaButton>
+                <DaText variant="small" className="text-da-gray-dark">
+                  Save & Add New
+                </DaText>
+              </DaButton>
+            )}
             <DaButton>
-              {createRelationMutation.isPending &&
-                !showFormAfterSubmit.current && (
-                  <DaLoader className="mr-2 !text-white !text-base" />
-                )}
+              {relationMutation.isPending && !showFormAfterSubmit.current && (
+                <DaLoader className="mr-2 !text-white !text-base" />
+              )}
               <DaText variant="small">Save</DaText>
             </DaButton>
           </div>

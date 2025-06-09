@@ -1,9 +1,16 @@
 'use client';
 
+import { DaButton } from '@/components/atoms/DaButton';
 import { InventoryRelation, RelationCardinality } from '@/types/inventory.type';
 import { ArcherContainer, ArcherElement } from 'react-archer';
+import { TbPencil } from 'react-icons/tb';
+import DeleteRelation from './delete-relation';
+import RelationForm from './relation-form';
+import { useState } from 'react';
+import clsx from 'clsx';
 
 interface RelationItemProps {
+  schemaId: string;
   relation: InventoryRelation;
   reverseDirection?: boolean;
 }
@@ -16,9 +23,12 @@ const mapCardinalityToRepresentation: Record<RelationCardinality, string> = {
 };
 
 export default function RelationItem({
+  schemaId,
   relation,
   reverseDirection,
 }: RelationItemProps) {
+  const [editing, setEditing] = useState(false);
+
   const processedRelation = {
     ...relation,
     source: reverseDirection ? relation.target : relation.source,
@@ -38,82 +48,119 @@ export default function RelationItem({
   };
 
   return (
-    <ArcherContainer endMarker={false} strokeColor="black" className="flex">
-      <div className="flex">
-        <ArcherElement
-          id={processedRelation.source.id + '1'}
-          relations={[
-            {
-              targetId: processedRelation.target.id + '2',
-              targetAnchor: 'left',
-              sourceAnchor: 'right',
-              label: (
-                <p className="-mt-6 da-label-small-bold">
-                  {processedRelation.name}
-                </p>
-              ),
-            },
-          ]}
-        >
-          <div className="relative w-[200px] lg:w-[280px]">
-            {processedRelation.source_role_name && (
-              <p className="absolute text-da-gray-dark text-xs top-[2px] text-nowrap left-[calc(100%+8px)]">
-                {processedRelation.source_role_name}
-              </p>
-            )}
-            {processedRelation.source_cardinality && (
-              <p className="absolute text-da-gray-dark text-xs bottom-0 text-nowrap left-[calc(100%+8px)]">
-                {
-                  mapCardinalityToRepresentation[
-                    processedRelation.source_cardinality
-                  ]
-                }
-              </p>
-            )}
-            {reverseDirection && (
-              <ArrowHead
-                type={processedRelation.type}
-                className="absolute top-[13px] -right-[17px]"
-              />
-            )}
-            <button className="rounded-lg truncate block text-sm w-full text-center border p-3 border-dashed border-da-gray-medium">
-              {processedRelation.source.name}
-            </button>
-          </div>
-        </ArcherElement>
+    <div className="flex gap-6 items-center w-full justify-between">
+      {!editing && (
+        <div className="max-w-[800px] flex-1">
+          <ArcherContainer
+            endMarker={false}
+            strokeColor="black"
+            className="flex"
+          >
+            <div className="flex">
+              <ArcherElement
+                id={processedRelation.source.id + '1'}
+                relations={[
+                  {
+                    targetId: processedRelation.target.id + '2',
+                    targetAnchor: 'left',
+                    sourceAnchor: 'right',
+                    label: (
+                      <p className="-mt-6 da-label-small-bold">
+                        {processedRelation.name}
+                      </p>
+                    ),
+                  },
+                ]}
+              >
+                <div className="relative w-[200px] xl:w-[280px]">
+                  {processedRelation.source_role_name && (
+                    <p className="absolute text-da-gray-dark text-xs top-[2px] text-nowrap left-[calc(100%+8px)]">
+                      {processedRelation.source_role_name}
+                    </p>
+                  )}
+                  {processedRelation.source_cardinality && (
+                    <p className="absolute text-da-gray-dark text-xs bottom-0 text-nowrap left-[calc(100%+8px)]">
+                      {
+                        mapCardinalityToRepresentation[
+                          processedRelation.source_cardinality
+                        ]
+                      }
+                    </p>
+                  )}
+                  {reverseDirection && (
+                    <ArrowHead
+                      type={processedRelation.type}
+                      className="absolute top-[13px] -right-[17px]"
+                    />
+                  )}
+                  <button className="rounded-lg truncate block text-sm w-full text-center border p-3 border-dashed border-da-gray-medium">
+                    {processedRelation.source.name}
+                  </button>
+                </div>
+              </ArcherElement>
 
-        <div className="w-60 lg:w-80" />
+              <div className="w-60 xl:w-80" />
 
-        {/* +2 to handle self reference relation */}
-        <ArcherElement id={processedRelation.target.id + '2'}>
-          <div className="relative w-[200px] lg:w-[280px]">
-            {processedRelation.target_role_name && (
-              <p className="absolute text-da-gray-dark flex top-[2px] text-nowrap text-xs right-[calc(100%+8px)]">
-                {processedRelation.target_role_name}
-              </p>
-            )}
-            {processedRelation.target_cardinality && (
-              <p className="absolute text-da-gray-dark text-xs bottom-0 text-nowrap right-[calc(100%+8px)]">
-                {
-                  mapCardinalityToRepresentation[
-                    processedRelation.target_cardinality
-                  ]
-                }
-              </p>
-            )}
-            {!reverseDirection && (
-              <ArrowHead
-                type={processedRelation.type}
-                className="absolute top-[13px] -left-[17px] rotate-180"
-              />
-            )}
-            <button className="truncate w-full block rounded-lg text-sm text-center border p-3">
-              {processedRelation.target.name}
-            </button>
-          </div>
-        </ArcherElement>
+              {/* +2 to handle self reference relation */}
+              <ArcherElement id={processedRelation.target.id + '2'}>
+                <div className="relative w-[200px] xl:w-[280px]">
+                  {processedRelation.target_role_name && (
+                    <p className="absolute text-da-gray-dark flex top-[2px] text-nowrap text-xs right-[calc(100%+8px)]">
+                      {processedRelation.target_role_name}
+                    </p>
+                  )}
+                  {processedRelation.target_cardinality && (
+                    <p className="absolute text-da-gray-dark text-xs bottom-0 text-nowrap right-[calc(100%+8px)]">
+                      {
+                        mapCardinalityToRepresentation[
+                          processedRelation.target_cardinality
+                        ]
+                      }
+                    </p>
+                  )}
+                  {!reverseDirection && (
+                    <ArrowHead
+                      type={processedRelation.type}
+                      className="absolute top-[13px] -left-[17px] rotate-180"
+                    />
+                  )}
+                  <button className="truncate w-full block rounded-lg text-sm text-center border p-3">
+                    {processedRelation.target.name}
+                  </button>
+                </div>
+              </ArcherElement>
+            </div>
+          </ArcherContainer>
+        </div>
+      )}
+
+      <div className={clsx('flex', editing && 'w-full')}>
+        <RelationForm
+          onFormClose={() => setEditing(false)}
+          className="w-full"
+          isUpdating
+          initialData={relation}
+          trigger={
+            editing ? null : (
+              <DaButton
+                onClick={() => setEditing(true)}
+                size="sm"
+                variant="plain"
+              >
+                <TbPencil className="mr-2" /> Edit
+              </DaButton>
+            )
+          }
+          schemaId={schemaId}
+        />
+        {!editing && (
+          <DeleteRelation
+            relationId={relation.id}
+            relationName={relation.name}
+          />
+        )}
       </div>
-    </ArcherContainer>
+    </div>
   );
 }
 
