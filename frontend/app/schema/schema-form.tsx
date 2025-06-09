@@ -12,6 +12,7 @@ import {
   InventorySchema,
   InventorySchemaFormData,
 } from '@/types/inventory.type';
+import { useQueryClient } from '@tanstack/react-query';
 import Ajv from 'ajv';
 import clsx from 'clsx';
 import Link from 'next/link';
@@ -55,15 +56,20 @@ const defaultJsonSchema = `{
 interface SchemaFormProps {
   initialData?: InventorySchema; // Use the actual Schema type for initial data structure
   isUpdating?: boolean;
+  redirectOnSuccess?: boolean;
+  onSuccess?: (result: InventorySchema) => void;
 }
 
 const InventorySchemaForm: React.FC<SchemaFormProps> = ({
   initialData,
   isUpdating = false,
+  redirectOnSuccess = true,
+  onSuccess,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   // Use the SchemaFormData type with useForm
   const {
@@ -107,22 +113,27 @@ const InventorySchemaForm: React.FC<SchemaFormProps> = ({
     });
   }, [initialData, reset]);
 
-  const handleCreateSchema: SubmitHandler<InventorySchemaFormData> = async (
-    formData
-  ) => {
+  const handleCreateSchema: (
+    formData: InventorySchemaFormData
+  ) => Promise<InventorySchema> = async (formData) => {
     const newSchema = await createInventorySchema(formData);
-    router.push(`/schema/${newSchema.id}`);
+    if (redirectOnSuccess) {
+      router.push(`/schema/${newSchema.id}`);
+    }
+    return newSchema;
   };
 
-  const handleUpdateSchema: SubmitHandler<InventorySchemaFormData> = async (
-    formData
-  ) => {
+  const handleUpdateSchema: (
+    formData: InventorySchemaFormData
+  ) => Promise<InventorySchema> | never = async (formData) => {
     if (!initialData) {
-      console.error('No initial data provided for update.');
-      return;
+      throw new Error('Initial data is required for updates.');
     }
-    await updateInventorySchema(initialData.id, formData);
-    router.push(`/schema/${initialData.id}`);
+    const updatedSchema = await updateInventorySchema(initialData.id, formData);
+    if (redirectOnSuccess) {
+      router.push(`/schema/${initialData.id}`);
+    }
+    return updatedSchema;
   };
 
   // handleSubmit already ensures data matches SchemaFormData type
@@ -131,17 +142,23 @@ const InventorySchemaForm: React.FC<SchemaFormProps> = ({
   ) => {
     try {
       setLoading(true);
+      let result: InventorySchema;
       if (!isUpdating) {
-        await handleCreateSchema(data);
+        result = await handleCreateSchema(data);
       } else {
-        await handleUpdateSchema(data);
+        result = await handleUpdateSchema(data);
       }
+      await queryClient.invalidateQueries({
+        queryKey: ['inventorySchemaList'],
+      });
+      onSuccess?.(result);
     } catch (error) {
       console.error('Error submitting form:', error);
       setError(
         (error as Error)?.message ||
           'An error occurred while submitting the form.'
       );
+    } finally {
       setLoading(false);
     }
   };
@@ -156,7 +173,11 @@ const InventorySchemaForm: React.FC<SchemaFormProps> = ({
   return (
     // Pass the typed handler to onSubmit
     <form
-      onSubmit={handleSubmit(handleFormSubmit)}
+      onSubmit={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        handleSubmit(handleFormSubmit)(e);
+      }}
       className="flex flex-col xl:flex-row gap-8"
     >
       <div className="space-y-6 xl:w-[360px]">

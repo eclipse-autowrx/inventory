@@ -102,7 +102,7 @@ export default async function PageSchemaDetail({
         <div className="mt-6">
           <DaText variant="regular-bold">Relations</DaText>
 
-          <RelationForm className="-mt-7" />
+          <RelationForm currentSchemaId={schema.id} className="-mt-7" />
 
           <RelationList schemaId={id} />
         </div>
