@@ -225,7 +225,7 @@ interface GetInventoryRelationsParams {
 
 export async function createInventoryRelation(data: InventoryRelationFormData) {
   const payload = Object.fromEntries(
-    Object.entries(data).filter(([, v]) => Boolean(v))
+    Object.entries(data).filter(([, v]) => v !== undefined)
   );
   const res = await attachAuthApiFetch(
     `${apiConfig.baseUrl}/inventory/relations`,
@@ -239,6 +239,32 @@ export async function createInventoryRelation(data: InventoryRelationFormData) {
     const errorData = await res.json();
     console.error('Failed to create relation:', errorData);
     throw new Error(errorData.message || 'Failed to create relation');
+  }
+
+  revalidatePath('/schema', 'page');
+  return res.json() as Promise<InventoryRelation>;
+}
+
+export async function updateInventoryRelation(
+  id: string,
+  data: Partial<InventoryRelationFormData>
+) {
+  const payload = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== undefined)
+  );
+
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/relations/${id}`,
+    {
+      method: 'PATCH',
+      body: payload,
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to update relation:', errorData);
+    throw new Error(errorData.message || 'Failed to update relation');
   }
 
   revalidatePath('/schema', 'page');

@@ -5,7 +5,7 @@ import { getServerSession } from '@/lib/auth/server-session-auth';
 import { InventoryRelation, InventorySchema } from '@/types/inventory.type';
 import dayjs from 'dayjs';
 import Link from 'next/link';
-import { TbEdit, TbPencil, TbPlus } from 'react-icons/tb';
+import { TbEdit, TbPlus } from 'react-icons/tb';
 import DeleteSchema from './delete-schema';
 import RelationForm from './(relation)/relation-form';
 import {
@@ -14,7 +14,6 @@ import {
 } from '@/services/inventory.service';
 import { List } from '@/types/common.type';
 import RelationItem from './(relation)/relation-item';
-import DeleteRelation from './(relation)/delete-relation';
 import { Fragment } from 'react';
 
 interface PageSchemaDetailProps {
@@ -102,9 +101,18 @@ export default async function PageSchemaDetail({
 
         <div className="mt-6">
           <DaText variant="regular-bold">Relations</DaText>
-
-          <RelationForm schemaId={schema.id} className="-mt-7" />
-
+          {session?.id === schema.created_by?.id && (
+            <RelationForm
+              triggerWrapperClassName="ml-auto"
+              trigger={
+                <DaButton size="sm" variant="outline-nocolor">
+                  <TbPlus className="mr-1" /> Add Relation
+                </DaButton>
+              }
+              schemaId={schema.id}
+              className="-mt-7"
+            />
+          )}
           <RelationList schemaId={id} />
         </div>
       </div>
@@ -163,20 +171,7 @@ async function RelationList({ schemaId }: RelationListProps) {
           <div className="rounded-xl mt-3 space-y-5 p-7 bg-white border">
             {outgoingRelations.results.map((relation, index) => (
               <Fragment key={relation.id}>
-                <div className="flex gap-6 items-center w-full justify-between">
-                  <div className="max-w-[800px] flex-1">
-                    <RelationItem relation={relation} />
-                  </div>
-                  <div className="flex">
-                    <DaButton size="sm" variant="plain">
-                      <TbPencil className="mr-2" /> Edit
-                    </DaButton>
-                    <DeleteRelation
-                      relationId={relation.id}
-                      relationName={relation.name}
-                    />
-                  </div>
-                </div>
+                <RelationItem schemaId={schemaId} relation={relation} />
 
                 {index < outgoingRelations.results.length - 1 && (
                   <div className="border-t" />
@@ -199,20 +194,11 @@ async function RelationList({ schemaId }: RelationListProps) {
           <div className="rounded-xl mt-3 space-y-5 p-7 bg-white border">
             {incomingRelations.results.map((relation, index) => (
               <Fragment key={relation.id}>
-                <div className="flex gap-6 items-center w-full justify-between">
-                  <div className="max-w-[800px] flex-1">
-                    <RelationItem reverseDirection relation={relation} />
-                  </div>
-                  <div className="flex">
-                    <DaButton size="sm" variant="plain">
-                      <TbPencil className="mr-2" /> Edit
-                    </DaButton>
-                    <DeleteRelation
-                      relationId={relation.id}
-                      relationName={relation.name}
-                    />
-                  </div>
-                </div>
+                <RelationItem
+                  schemaId={schemaId}
+                  reverseDirection
+                  relation={relation}
+                />
 
                 {index < incomingRelations.results.length - 1 && (
                   <div className="border-t" />
