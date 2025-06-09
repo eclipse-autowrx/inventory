@@ -269,3 +269,20 @@ export async function getInventoryRelations(
 
   return res.json();
 }
+
+export async function deleteInventoryRelation(id: string) {
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/relations/${id}`,
+    {
+      method: 'DELETE',
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to delete relation:', errorData);
+    throw new Error(errorData.message || 'Failed to delete relation');
+  }
+
+  revalidatePath('/schema', 'page');
+}
