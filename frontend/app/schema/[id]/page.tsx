@@ -1,14 +1,20 @@
 import { DaButton } from '@/components/atoms/DaButton';
 import DaText from '@/components/atoms/DaText';
 import DaUserProfile from '@/components/molecules/DaUserProfile';
-import { apiConfig } from '@/configs/api';
-import { attachAuthApiFetch } from '@/lib/attach-auth-api-fetch';
 import { getServerSession } from '@/lib/auth/server-session-auth';
-import { InventorySchema } from '@/types/inventory.type';
+import { InventoryRelation, InventorySchema } from '@/types/inventory.type';
 import dayjs from 'dayjs';
 import Link from 'next/link';
-import { TbEdit, TbPlus } from 'react-icons/tb';
+import { TbEdit, TbPencil, TbPlus } from 'react-icons/tb';
 import DeleteSchema from './delete-schema';
+import RelationForm from './(relation)/relation-form';
+import {
+  getInventoryRelations,
+  getInventorySchema,
+} from '@/services/inventory.service';
+import { List } from '@/types/common.type';
+import RelationItem from './(relation)/relation-item';
+import DeleteRelation from './(relation)/delete-relation';
 
 interface PageSchemaDetailProps {
   params: {
@@ -23,24 +29,23 @@ export default async function PageSchemaDetail({
 
   const session = await getServerSession();
 
-  const res = await attachAuthApiFetch(
-    `${apiConfig.baseUrl}/inventory/schemas/${id}`
-  );
-
-  const schema = (await res.json()) as InventorySchema;
-
-  if (!res.ok) {
-    console.error('Failed to fetch schema:', schema);
+  let schema: InventorySchema;
+  try {
+    schema = await getInventorySchema(id);
+  } catch (error) {
+    console.error('Error fetching schema:', error);
     return (
-      <div className="w-full min-h-[280px] flex items-center justify-center">
-        Failed to fetch schema details.
+      <div className="container mx-auto p-4">
+        <DaText variant="title" className="text-red-500">
+          Error fetching schema details.
+        </DaText>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto p-4">
-      <div className="bg-white rounded-lg">
+      <div className="rounded-lg">
         <div className="flex flex-col sm:flex-row justify-between items-start mb-4 gap-4">
           <div className="flex-grow">
             <DaText variant="title" className="!text-da-primary-500">
@@ -92,6 +97,120 @@ export default async function PageSchemaDetail({
           <DaText variant="small">
             Created At: {dayjs(schema.created_at).format('DD-MM-YYYY HH:mm:ss')}
           </DaText>
+        </div>
+
+        <div className="mt-6">
+          <DaText variant="regular-bold">Relations</DaText>
+
+          <RelationForm className="-mt-7" />
+
+          <RelationList schemaId={id} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface RelationListProps {
+  schemaId: string;
+}
+async function RelationList({ schemaId }: RelationListProps) {
+  let outgoingRelations: List<InventoryRelation>,
+    incomingRelations: List<InventoryRelation>;
+
+  try {
+    [outgoingRelations, incomingRelations] = await Promise.all([
+      getInventoryRelations({
+        source: schemaId,
+      }),
+      getInventoryRelations({
+        target: schemaId,
+      }),
+    ]);
+  } catch (error) {
+    console.error('Error fetching relations:', error);
+    return (
+      <div className="container mx-auto p-4">
+        <DaText variant="title" className="text-red-500">
+          Error fetching relations.
+        </DaText>
+      </div>
+    );
+  }
+
+  if (
+    outgoingRelations.results.length === 0 &&
+    incomingRelations.results.length === 0
+  ) {
+    return (
+      <div className="h-[200px] mt-4">
+        There is no relation defined for this schema.
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-7">
+      <DaText variant="small-bold" className="text-da-gray-darkest">
+        Outgoing Relations ({outgoingRelations.totalResults})
+      </DaText>
+      <div className="rounded-xl mt-3 space-y-5 p-7 bg-white border">
+        <div className="flex gap-6 items-center w-full justify-between">
+          <div className="max-w-[800px] flex-1">
+            <RelationItem />
+          </div>
+          <div className="flex">
+            <DaButton size="sm" variant="plain">
+              <TbPencil className="mr-2" /> Edit
+            </DaButton>
+            <DeleteRelation />
+          </div>
+        </div>
+
+        <div className="border-t" />
+
+        <div className="flex gap-6 items-center w-full justify-between">
+          <div className="max-w-[800px] flex-1">
+            <RelationItem />
+          </div>
+          <div className="flex">
+            <DaButton size="sm" variant="plain">
+              <TbPencil className="mr-2" /> Edit
+            </DaButton>
+            <DeleteRelation />
+          </div>
+        </div>
+      </div>
+
+      <DaText variant="small-bold" className="block mt-7 text-da-gray-darkest">
+        Incoming Relations ({incomingRelations.totalResults})
+      </DaText>
+
+      <div className="rounded-xl mt-3 space-y-5 p-7 bg-white border">
+        <div className="flex gap-6 items-center w-full justify-between">
+          <div className="max-w-[800px] flex-1">
+            <RelationItem />
+          </div>
+          <div className="flex">
+            <DaButton size="sm" variant="plain">
+              <TbPencil className="mr-2" /> Edit
+            </DaButton>
+            <DeleteRelation />
+          </div>
+        </div>
+
+        <div className="border-t" />
+
+        <div className="flex gap-6 items-center w-full justify-between">
+          <div className="max-w-[800px] flex-1">
+            <RelationItem />
+          </div>
+          <div className="flex">
+            <DaButton size="sm" variant="plain">
+              <TbPencil className="mr-2" /> Edit
+            </DaButton>
+            <DeleteRelation />
+          </div>
         </div>
       </div>
     </div>
