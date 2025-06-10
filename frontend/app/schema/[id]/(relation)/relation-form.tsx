@@ -71,8 +71,9 @@ export default function RelationForm({
 
   const relationMutation = useMutation({
     mutationFn: async (data: InventoryRelationFormData) => {
-      if (data.source_cardinality === 'n/a') data.source_cardinality = '';
-      if (data.target_cardinality === 'n/a') data.target_cardinality = '';
+      // Set to null to explicitly remove those fields
+      if (data.source_cardinality === 'n/a') data.source_cardinality = null;
+      if (data.target_cardinality === 'n/a') data.target_cardinality = null;
       if (!isUpdating) {
         return createInventoryRelation(data);
       }
@@ -80,6 +81,7 @@ export default function RelationForm({
       const updatedData: Partial<InventoryRelationFormData> = {
         ...data,
       };
+      // Completely delete to avoid providing empty value since source and target are required
       delete updatedData.source;
       delete updatedData.target;
       if (!initialData) {
@@ -310,8 +312,8 @@ export default function RelationForm({
                   isUpdating
                     ? 'Cannot change source during update. Delete and create a new relation instead.'
                     : anchor === 'source'
-                      ? 'Fixed to current schema (use swap button to change relationship direction)'
-                      : undefined
+                    ? 'Fixed to current schema (use swap button to change relationship direction)'
+                    : undefined
                 }
               />
               {errors.source && (
@@ -342,7 +344,11 @@ export default function RelationForm({
               </DaText>
               <DaSelect
                 className="mt-3"
-                value={sourceCardinalityValue}
+                value={
+                  sourceCardinalityValue === null
+                    ? 'n/a'
+                    : sourceCardinalityValue
+                }
                 onValueChange={sourceCardinalityOnChange}
               >
                 <DaSelectItem value="n/a">
@@ -388,8 +394,8 @@ export default function RelationForm({
                   isUpdating
                     ? 'Cannot change target during update. Delete and create a new relation instead.'
                     : anchor === 'target'
-                      ? 'Fixed to current schema (use swap button to change relationship direction)'
-                      : undefined
+                    ? 'Fixed to current schema (use swap button to change relationship direction)'
+                    : undefined
                 }
                 className="mt-3"
                 placeholder="Search for Target Schema..."
@@ -422,7 +428,11 @@ export default function RelationForm({
               </DaText>
               <DaSelect
                 className="mt-3"
-                value={targetCardinalityValue}
+                value={
+                  targetCardinalityValue === null
+                    ? 'n/a'
+                    : targetCardinalityValue
+                }
                 onValueChange={targetCardinalityOnChange}
               >
                 <DaSelectItem value="n/a">

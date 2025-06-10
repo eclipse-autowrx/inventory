@@ -11,8 +11,12 @@ const createRelation = {
     description: Joi.string().trim().allow(''),
     source: Joi.string().custom(objectId).required(),
     target: Joi.string().custom(objectId).required(),
-    source_cardinality: Joi.string().valid(...CARDINALITIES),
-    target_cardinality: Joi.string().valid(...CARDINALITIES),
+    source_cardinality: Joi.string()
+      .valid(...CARDINALITIES)
+      .allow(null),
+    target_cardinality: Joi.string()
+      .valid(...CARDINALITIES)
+      .allow(null),
     source_role_name: Joi.string(),
     target_role_name: Joi.string(),
     metadata: Joi.any(),
@@ -53,11 +57,16 @@ const updateRelation = {
       description: Joi.string().trim().allow(''),
       name: Joi.string().trim(),
       is_core: Joi.boolean(),
-      source_cardinality: Joi.string().valid(...CARDINALITIES),
-      target_cardinality: Joi.string().valid(...CARDINALITIES),
+      source_cardinality: Joi.string()
+        .valid(...CARDINALITIES)
+        .allow(null),
+      target_cardinality: Joi.string()
+        .valid(...CARDINALITIES)
+        .allow(null),
       source_role_name: Joi.string(),
       target_role_name: Joi.string(),
       metadata: Joi.any(),
+      type: Joi.string().trim(),
     })
     .min(1),
 };
