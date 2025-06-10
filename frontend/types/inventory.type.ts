@@ -119,6 +119,6 @@ export interface InventoryRelationFormData {
   target: string;
   source_role_name?: string;
   target_role_name?: string;
-  source_cardinality?: string;
-  target_cardinality?: string;
+  source_cardinality?: string | null;
+  target_cardinality?: string | null;
 }

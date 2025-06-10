@@ -42,6 +42,13 @@ const createRelation = async (relationBody, userId) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Relation of this type between these schemas already exists');
   }
 
+  if ('source_cardinality' in relationBody && !relationBody.source_cardinality) {
+    delete relationBody.source_cardinality;
+  }
+  if ('target_cardinality' in relationBody && !relationBody.target_cardinality) {
+    delete relationBody.target_cardinality;
+  }
+
   const relation = await Relation.create({
     ...relationBody,
     created_by: userId,
@@ -131,6 +138,14 @@ const updateRelationById = async (relationId, updateBody) => {
   }
 
   Object.assign(relation, updateBody);
+
+  if (updateBody.source_cardinality === null) {
+    delete relation._doc.source_cardinality;
+  }
+  if (updateBody.target_cardinality === null) {
+    delete relation._doc.target_cardinality;
+  }
+
   await relation.save();
   return relation;
 };
