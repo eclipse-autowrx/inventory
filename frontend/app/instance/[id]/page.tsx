@@ -8,6 +8,7 @@ import DeleteInstance from './delete-instance';
 import dayjs from 'dayjs';
 import { DaAvatar } from '@/components/atoms/DaAvatar';
 import ShowSchema from './show-schema';
+import InstanceRelationList from './(instance-relation)/instance-relation-list';
 
 interface PageInstanceDetailProps {
   params: Promise<{
@@ -33,7 +34,7 @@ export default async function PageInstanceDetail({
 
   return (
     <div className="container text-sm pb-10 text-da-gray-dark">
-      <div className="mt-5 flex md:flex-row flex-col gap-2 items-end py-3">
+      <div className="pt-5 flex md:flex-row flex-col gap-2 items-end py-3">
         <div className="flex flex-col gap-2 mr-10">
           <DaText variant="title" className="!block text-da-primary-500">
             {instance.name || '-'}
@@ -92,7 +93,6 @@ const Detail = ({
         <DaText variant="regular-bold" className="text-da-gray-darkest">
           Detail
         </DaText>
-
         <div className="flex md:flex-row flex-col gap-4 justify-between pt-5">
           {/* Render detail data */}
           <div className="flex flex-col gap-4 min-w-0 flex-1">
@@ -115,12 +115,10 @@ const Detail = ({
             ))}
           </div>
         </div>
-
         <div className="border-t border-t-da-gray-light/50 my-6" />
         <DaText variant="regular-bold" className="text-da-gray-darkest">
           Metadata
         </DaText>
-
         <div className="flex md:flex-row flex-col gap-4 justify-between pt-5">
           <div className="flex flex-col gap-4 min-w-0 flex-1">
             <div>
@@ -156,7 +154,6 @@ const Detail = ({
             </div>
           </div>
         </div>
-
         <div className="border-t border-t-da-gray-light/50 my-6" />
         <DaText variant="regular-bold" className="text-da-gray-darkest">
           Inventory Schema
@@ -190,6 +187,15 @@ const Detail = ({
             schemaDefinition={instanceData.schema.schema_definition}
           />
         </div>
+
+        <div className="border-t border-t-da-gray-light/50 my-6" />
+        <DaText variant="regular-bold" className="text-da-gray-darkest">
+          Relationships
+        </DaText>
+        <InstanceRelationList
+          instanceId={instanceData.id}
+          schemaId={instanceData.schema.id}
+        />
       </div>
     </div>
   );

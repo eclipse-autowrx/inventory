@@ -60,6 +60,12 @@ export interface InventoryInstance {
   created_at: string;
 }
 
+export interface InventorySimplifiedInstance {
+  id: string;
+  name: string;
+  schema: string;
+}
+
 export type InventoryInstanceDetail = Omit<InventoryInstance, 'schema'> & {
   schema: InventorySchema;
 };
@@ -112,6 +118,14 @@ export interface InventoryRelation {
   created_by?: SimplifiedUser;
 }
 
+export interface InventorySimplifiedRelation {
+  id: string;
+  name: string;
+  type: string;
+  source: string;
+  target: string;
+}
+
 export interface InventoryRelationFormData {
   name: string;
   type: string;
@@ -121,4 +135,14 @@ export interface InventoryRelationFormData {
   target_role_name?: string;
   source_cardinality?: string | null;
   target_cardinality?: string | null;
+}
+
+export interface InventoryInstanceRelation {
+  id: string;
+  relation: InventorySimplifiedRelation;
+  source: InventorySimplifiedInstance;
+  target: InventorySimplifiedInstance;
+  metadata: any;
+  created_by?: SimplifiedUser;
+  description?: string;
 }
