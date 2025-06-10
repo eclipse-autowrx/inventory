@@ -5,7 +5,7 @@ import { getServerSession } from '@/lib/auth/server-session-auth';
 import { InventoryRelation, InventorySchema } from '@/types/inventory.type';
 import dayjs from 'dayjs';
 import Link from 'next/link';
-import { TbEdit, TbPlus } from 'react-icons/tb';
+import { TbEdit, TbList, TbPlus } from 'react-icons/tb';
 import DeleteSchema from './delete-schema';
 import RelationForm from './(relation)/relation-form';
 import {
@@ -61,6 +61,11 @@ export default async function PageSchemaDetail({
               <Link href={`/instance/new?schemaId=${schema.id}`}>
                 <DaButton size="sm">
                   <TbPlus size={18} className="mr-1" /> New Instance
+                </DaButton>
+              </Link>
+              <Link href={`/instance/?schema=${schema.id}`}>
+                <DaButton variant="plain" size="sm">
+                  <TbList size={18} className="mr-1" /> View Instances
                 </DaButton>
               </Link>
               <Link
