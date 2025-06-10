@@ -8,13 +8,14 @@ import {
   InventoryInstanceCreatePayload,
   InventoryInstanceDetail,
   InventoryInstanceFormData,
+  InventoryInstanceRelation,
   InventoryInstanceUpdatePayload,
   InventoryRelation,
   InventoryRelationFormData,
   InventorySchema,
   InventorySchemaFormData,
 } from '@/types/inventory.type';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export async function getInventorySchemas() {
   const res = await attachAuthApiFetch(
@@ -241,7 +242,7 @@ export async function createInventoryRelation(data: InventoryRelationFormData) {
     throw new Error(errorData.message || 'Failed to create relation');
   }
 
-  revalidatePath('/schema', 'page');
+  revalidateTag('inventory-relations');
   return res.json() as Promise<InventoryRelation>;
 }
 
@@ -267,7 +268,7 @@ export async function updateInventoryRelation(
     throw new Error(errorData.message || 'Failed to update relation');
   }
 
-  revalidatePath('/schema', 'page');
+  revalidateTag('inventory-relations');
   return res.json() as Promise<InventoryRelation>;
 }
 
@@ -284,6 +285,9 @@ export async function getInventoryRelations(
     }`,
     {
       method: 'GET',
+      next: {
+        tags: ['inventory-relations'],
+      },
     }
   );
 
@@ -293,7 +297,7 @@ export async function getInventoryRelations(
     throw new Error(errorData.message || 'Failed to fetch relations');
   }
 
-  return res.json();
+  return res.json() as Promise<List<InventoryRelation>>;
 }
 
 export async function deleteInventoryRelation(id: string) {
@@ -310,5 +314,34 @@ export async function deleteInventoryRelation(id: string) {
     throw new Error(errorData.message || 'Failed to delete relation');
   }
 
-  revalidatePath('/schema', 'page');
+  revalidateTag('inventory-relations');
+}
+
+export async function getInventoryInstanceRelations(params?: {
+  relation?: string;
+  source?: string;
+  target?: string;
+}) {
+  const searchParams = new URLSearchParams(
+    params as Record<string, string> | undefined
+  );
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/instance-relations${
+      searchParams.size === 0 ? '' : `?${searchParams.toString()}`
+    }`,
+    {
+      method: 'GET',
+      next: {
+        tags: ['inventory-instance-relations'],
+      },
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to get instance relations:', errorData);
+    throw new Error(errorData.message || 'Failed to get instance relations');
+  }
+
+  return res.json() as Promise<List<InventoryInstanceRelation>>;
 }
