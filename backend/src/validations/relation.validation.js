@@ -17,8 +17,8 @@ const createRelation = {
     target_cardinality: Joi.string()
       .valid(...CARDINALITIES)
       .allow(null),
-    source_role_name: Joi.string(),
-    target_role_name: Joi.string(),
+    source_role_name: Joi.string().allow(''),
+    target_role_name: Joi.string().allow(''),
     metadata: Joi.any(),
   }),
 };
@@ -63,8 +63,8 @@ const updateRelation = {
       target_cardinality: Joi.string()
         .valid(...CARDINALITIES)
         .allow(null),
-      source_role_name: Joi.string(),
-      target_role_name: Joi.string(),
+      source_role_name: Joi.string().allow(''),
+      target_role_name: Joi.string().allow(''),
       metadata: Joi.any(),
       type: Joi.string().trim(),
     })
