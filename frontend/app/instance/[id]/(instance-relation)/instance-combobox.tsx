@@ -23,7 +23,10 @@ import clsx from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 import { TbCheck, TbChevronDown, TbPlus } from 'react-icons/tb';
 import InstanceForm from '../../instance-form';
-import { InventorySimplifiedSchema } from '@/types/inventory.type';
+import {
+  InventoryInstance,
+  InventorySimplifiedSchema,
+} from '@/types/inventory.type';
 
 interface InstanceComboboxProps {
   value?: string;
@@ -37,8 +40,8 @@ interface InstanceComboboxProps {
 }
 
 export default function InstanceCombobox({
-  value: outerValue,
-  onChange: outerOnChange,
+  value: outerSelectedInstanceId,
+  onChange: outerOnChangeSelectedInstanceId,
   placeholder,
   className,
   disabled,
@@ -51,18 +54,28 @@ export default function InstanceCombobox({
   });
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(outerValue || '');
+  const [selectedInstanceId, setSelectedInstanceId] = useState(
+    outerSelectedInstanceId || ''
+  );
 
   const openCreateInstanceFormState = useState(false);
 
   useEffect(() => {
-    if (outerValue !== undefined && outerValue !== value) {
-      setValue(outerValue);
+    if (
+      outerSelectedInstanceId !== undefined &&
+      outerSelectedInstanceId !== selectedInstanceId
+    ) {
+      setSelectedInstanceId(outerSelectedInstanceId);
     }
-  }, [outerValue, value]);
+  }, [outerSelectedInstanceId, selectedInstanceId]);
 
   const sortedByExcludedIdInstances = useMemo(() => {
-    const results = data?.results || [];
+    const results: (InventoryInstance & { comboboxValue: string })[] = (
+      data?.results || []
+    ).map((i) => ({
+      ...i,
+      comboboxValue: `${i.id} ${i.name}`,
+    }));
     if (excludedInstanceIds) {
       results.sort(
         (a, b) =>
@@ -73,6 +86,11 @@ export default function InstanceCombobox({
 
     return results;
   }, [data?.results, excludedInstanceIds]);
+
+  const extractIdFromComboboxValue = (value: string) => {
+    // First split is the id
+    return value.split(' ')[0];
+  };
 
   const InstanceComboboxPopoverTrigger = useMemo(() => {
     return (
@@ -87,9 +105,9 @@ export default function InstanceCombobox({
               className="flex items-center justify-between"
               variant="small"
             >
-              {value
+              {selectedInstanceId
                 ? sortedByExcludedIdInstances.find(
-                    (instance) => instance.id === value
+                    (instance) => instance.id === selectedInstanceId
                   )?.name
                 : placeholder}
               <TbChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -106,7 +124,7 @@ export default function InstanceCombobox({
     isLoading,
     placeholder,
     sortedByExcludedIdInstances,
-    value,
+    selectedInstanceId,
   ]);
 
   return (
@@ -141,20 +159,26 @@ export default function InstanceCombobox({
                 {sortedByExcludedIdInstances.map((instance) => (
                   <CommandItem
                     disabled={disabled || excludedInstanceIds?.has(instance.id)}
-                    key={instance.id}
-                    value={instance.id}
+                    key={instance.comboboxValue}
+                    value={instance.comboboxValue}
                     onSelect={(currentValue) => {
-                      outerOnChange?.(
-                        currentValue === value ? '' : currentValue
+                      const extractedId =
+                        extractIdFromComboboxValue(currentValue);
+                      outerOnChangeSelectedInstanceId?.(
+                        extractedId === selectedInstanceId ? '' : extractedId
                       );
-                      setValue(currentValue === value ? '' : currentValue);
+                      setSelectedInstanceId(
+                        extractedId === selectedInstanceId ? '' : extractedId
+                      );
                       setOpen(false);
                     }}
                   >
                     <TbCheck
                       className={clsx(
                         'h-4 w-4',
-                        value === instance.id ? 'opacity-100' : 'opacity-0'
+                        selectedInstanceId === instance.id
+                          ? 'opacity-100'
+                          : 'opacity-0'
                       )}
                     />
                     {instance.name}
@@ -180,8 +204,8 @@ export default function InstanceCombobox({
           allowSchemaChange={false}
           onSuccess={(result) => {
             openCreateInstanceFormState[1](false);
-            outerOnChange?.(result.id);
-            setValue(result.id);
+            outerOnChangeSelectedInstanceId?.(result.id);
+            setSelectedInstanceId(result.id);
           }}
           redirectOnSuccess={false}
         />
