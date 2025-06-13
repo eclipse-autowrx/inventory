@@ -34,8 +34,8 @@ interface SchemaComboboxProps {
 }
 
 export default function SchemaCombobox({
-  value: outerValue,
-  onChange: outerOnChange,
+  value: outerSelectedSchemaId,
+  onChange: outerOnChangeSelectedSchemaId,
   placeholder,
   className,
   disabled,
@@ -44,19 +44,31 @@ export default function SchemaCombobox({
   const { data, isLoading } = useListInventorySchemas();
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(outerValue || '');
+  const [selectedSchemaId, setSelectedSchemaId] = useState(
+    outerSelectedSchemaId || ''
+  );
 
   const openCreateSchemaFormState = useState(false);
 
   useEffect(() => {
-    if (outerValue !== undefined && outerValue !== value) {
-      setValue(outerValue);
+    if (
+      outerSelectedSchemaId !== undefined &&
+      outerSelectedSchemaId !== selectedSchemaId
+    ) {
+      setSelectedSchemaId(outerSelectedSchemaId);
     }
-  }, [outerValue, value]);
+  }, [outerSelectedSchemaId, selectedSchemaId]);
 
   const schemas = useMemo(() => {
-    return data?.results || [];
+    return (data?.results || []).map((schema) => ({
+      ...schema,
+      comboboxValue: `${schema.id} ${schema.name}`,
+    }));
   }, [data]);
+
+  const extractIdFromComboboxValue = (value: string) => {
+    return value.split(' ')[0];
+  };
 
   const SchemaComboboxPopoverTrigger = useMemo(() => {
     return (
@@ -71,8 +83,8 @@ export default function SchemaCombobox({
               className="flex items-center justify-between"
               variant="small"
             >
-              {value
-                ? schemas.find((schema) => schema.id === value)?.name
+              {selectedSchemaId
+                ? schemas.find((schema) => schema.id === selectedSchemaId)?.name
                 : placeholder}
               <TbChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </DaText>
@@ -82,7 +94,7 @@ export default function SchemaCombobox({
         </DaButton>
       </PopoverTrigger>
     );
-  }, [className, disabled, isLoading, placeholder, schemas, value]);
+  }, [className, disabled, isLoading, placeholder, schemas, selectedSchemaId]);
 
   return (
     <>
@@ -112,20 +124,26 @@ export default function SchemaCombobox({
                 {schemas.map((schema) => (
                   <CommandItem
                     disabled={disabled}
-                    key={schema.id}
-                    value={schema.id}
+                    key={schema.comboboxValue}
+                    value={schema.comboboxValue}
                     onSelect={(currentValue) => {
-                      outerOnChange?.(
-                        currentValue === value ? '' : currentValue
+                      const extractedId =
+                        extractIdFromComboboxValue(currentValue);
+                      outerOnChangeSelectedSchemaId?.(
+                        extractedId === selectedSchemaId ? '' : extractedId
                       );
-                      setValue(currentValue === value ? '' : currentValue);
+                      setSelectedSchemaId(
+                        extractedId === selectedSchemaId ? '' : extractedId
+                      );
                       setOpen(false);
                     }}
                   >
                     <TbCheck
                       className={clsx(
                         'h-4 w-4',
-                        value === schema.id ? 'opacity-100' : 'opacity-0'
+                        selectedSchemaId === schema.id
+                          ? 'opacity-100'
+                          : 'opacity-0'
                       )}
                     />
                     {schema.name}
@@ -145,8 +163,8 @@ export default function SchemaCombobox({
         <InventorySchemaForm
           onSuccess={(result) => {
             openCreateSchemaFormState[1](false);
-            outerOnChange?.(result.id);
-            setValue(result.id);
+            outerOnChangeSelectedSchemaId?.(result.id);
+            setSelectedSchemaId(result.id);
           }}
           redirectOnSuccess={false}
         />
