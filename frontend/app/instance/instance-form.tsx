@@ -9,11 +9,17 @@ import { DaButton } from '@/components/atoms/DaButton';
 import { DaInput } from '@/components/atoms/DaInput';
 import { DaSelect, DaSelectItem } from '@/components/atoms/DaSelect';
 import DaTooltip from '@/components/atoms/DaTooltip';
-import CodeEditorWithSize from '@/components/molecules/CodeEditorWithSize';
 import useListInventorySchemas from '@/hooks/useListInventorySchemas';
 import { InventoryInstance } from '@/types/inventory.type';
 import clsx from 'clsx';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { TbLoader } from 'react-icons/tb';
 import { toast } from 'react-toastify';
 import {
@@ -22,6 +28,11 @@ import {
 } from '@/services/inventory.service';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import { DaSkeleton } from '@/components/atoms/DaSkeleton';
+
+const CodeEditorWithSize = lazy(
+  () => import('@/components/molecules/CodeEditorWithSize')
+);
 
 interface InstanceFormProps {
   isUpdating?: boolean;
@@ -69,7 +80,7 @@ export default function InstanceForm({
     if (initialSchemaId) setSchemaId(initialSchemaId);
   }, [initialSchemaId]);
 
-  // Update state with initial data if provided
+  // Update state with initial if provided
   useEffect(() => {
     if (initialData) {
       setInstanceName(initialData.name);
@@ -322,13 +333,24 @@ export default function InstanceForm({
         )}
         {dataFillingMode === 'code' && (
           <div className="-mt-8">
-            <CodeEditorWithSize
-              code={code}
-              language="json"
-              onBlur={() => {}}
-              setCode={setCode}
-              editable={!loading}
-            />
+            <Suspense
+              fallback={
+                <div>
+                  <div className="flex mb-3 justify-end">
+                    <DaSkeleton className="h-6 w-[100px] rounded-md" />
+                  </div>
+                  <DaSkeleton className="h-[320px] w-full rounded-md" />
+                </div>
+              }
+            >
+              <CodeEditorWithSize
+                code={code}
+                language="json"
+                onBlur={() => {}}
+                setCode={setCode}
+                editable={!loading}
+              />
+            </Suspense>
           </div>
         )}
       </div>

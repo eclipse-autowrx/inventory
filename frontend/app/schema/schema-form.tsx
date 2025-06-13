@@ -2,8 +2,8 @@
 
 import { DaButton } from '@/components/atoms/DaButton';
 import { DaInput } from '@/components/atoms/DaInput';
+import { DaSkeleton } from '@/components/atoms/DaSkeleton';
 import { DaTextarea } from '@/components/atoms/DaTextarea';
-import CodeEditorWithSize from '@/components/molecules/CodeEditorWithSize';
 import {
   createInventorySchema,
   updateInventorySchema,
@@ -17,7 +17,7 @@ import Ajv from 'ajv';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import {
   useForm,
   SubmitHandler,
@@ -25,6 +25,11 @@ import {
   useController,
 } from 'react-hook-form';
 import { TbLoader } from 'react-icons/tb';
+
+// lazy load
+const CodeEditorWithSize = lazy(
+  () => import('@/components/molecules/CodeEditorWithSize')
+);
 
 const ajv = new Ajv();
 
@@ -232,20 +237,32 @@ const InventorySchemaForm: React.FC<SchemaFormProps> = ({
 
       <div className="flex-1 min-w-0">
         {/* Schema Definition Field (Textarea) */}
-        <CodeEditorWithSize
-          language="json"
-          onBlur={onSchemaDefinitionBlur}
-          setCode={onSchemaDefinitionChange}
-          code={schemaDefinitionValue}
-          loading={loading}
-          title={
-            <>
-              Schema Definition (JSON){' '}
-              {!isUpdating && <span className="text-red-500">*</span>}
-            </>
-          }
-        />
 
+        <Suspense
+          fallback={
+            <div>
+              <div className="flex mb-3 justify-between">
+                <DaSkeleton className="h-6 w-[100px] rounded-md" />
+                <DaSkeleton className="h-6 w-[100px] rounded-md" />
+              </div>
+              <DaSkeleton className="h-[320px] w-full rounded-md" />
+            </div>
+          }
+        >
+          <CodeEditorWithSize
+            language="json"
+            onBlur={onSchemaDefinitionBlur}
+            setCode={onSchemaDefinitionChange}
+            code={schemaDefinitionValue}
+            loading={loading}
+            title={
+              <>
+                Schema Definition (JSON){' '}
+                {!isUpdating && <span className="text-red-500">*</span>}
+              </>
+            }
+          />
+        </Suspense>
         {errors.schema_definition && (
           <p className="mt-1 da-txt-small text-red-600" role="alert">
             {getErrorMessage(errors.schema_definition)}
