@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import DaText from '@/components/atoms/DaText';
 import {
   getInventoryInstanceRelations,
@@ -42,7 +41,6 @@ export default async function InstanceRelationList({
     <div>
       {outgoingRelations.map((relation) => (
         <InstanceRelationItem
-          schemaId={schemaId}
           relation={relation}
           instanceId={instanceId}
           key={relation.id}
@@ -54,11 +52,9 @@ export default async function InstanceRelationList({
 
 async function InstanceRelationItem({
   relation,
-  schemaId,
   instanceId,
 }: {
   relation: InventoryRelation;
-  schemaId: string;
   instanceId: string;
 }) {
   let instanceRelations: List<InventoryInstanceRelation>;
@@ -76,6 +72,11 @@ async function InstanceRelationItem({
     );
   }
 
+  const excludedInstanceIds = new Set<string>([
+    instanceId,
+    ...instanceRelations.results.map((ir) => ir.target.id),
+  ]);
+
   return (
     <div key={relation.id} className="p-7 bg-white border mt-6 rounded-xl">
       <div className="flex items-center justify-between">
@@ -88,7 +89,12 @@ async function InstanceRelationItem({
           Add Element
         </DaButton> */}
       </div>
-      <InstanceRelationForm className="-mt-6" relation={relation} />
+      <InstanceRelationForm
+        currentInstanceId={instanceId}
+        className="-mt-6"
+        excludedInstanceIds={excludedInstanceIds}
+        relation={relation}
+      />
       <div className="border-t my-6" />
 
       {instanceRelations.results.length === 0 ? (

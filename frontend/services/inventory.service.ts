@@ -9,6 +9,7 @@ import {
   InventoryInstanceDetail,
   InventoryInstanceFormData,
   InventoryInstanceRelation,
+  InventoryInstanceRelationFormData,
   InventoryInstanceUpdatePayload,
   InventoryRelation,
   InventoryRelationFormData,
@@ -344,4 +345,25 @@ export async function getInventoryInstanceRelations(params?: {
   }
 
   return res.json() as Promise<List<InventoryInstanceRelation>>;
+}
+
+export async function createInventoryInstanceRelation(
+  body: InventoryInstanceRelationFormData
+) {
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/instance-relations`,
+    {
+      method: 'POST',
+      body,
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to create instance relation:', errorData);
+    throw new Error(errorData.message || 'Failed to create instance relation');
+  }
+
+  revalidateTag('inventory-instance-relations');
+  return res.json() as Promise<InventoryInstanceRelation>;
 }

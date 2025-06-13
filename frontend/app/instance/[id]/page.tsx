@@ -166,9 +166,17 @@ const Detail = ({
             >
               Name
             </DaText>
-            <DaText variant="small" className="text-da-gray-darkest ml-2">
-              {instanceData.schema?.name || '-'}
-            </DaText>
+            <Link
+              className="hover:underline group"
+              href={`/schema/${instanceData.schema.id}`}
+            >
+              <DaText
+                variant="small"
+                className="group-hover:text-da-primary-500 text-da-gray-darkest ml-2"
+              >
+                {instanceData.schema?.name || '-'}
+              </DaText>
+            </Link>
           </div>
 
           <div>

@@ -21,19 +21,27 @@ import {
   updateInventoryInstance,
 } from '@/services/inventory.service';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface InstanceFormProps {
   isUpdating?: boolean;
   initialData?: InventoryInstance;
   initialSchemaId?: string;
+  onSuccess?: (result: InventoryInstance) => void;
+  redirectOnSuccess?: boolean;
+  allowSchemaChange?: boolean;
 }
 
 export default function InstanceForm({
   isUpdating,
   initialData,
   initialSchemaId,
+  redirectOnSuccess = true,
+  onSuccess,
+  allowSchemaChange = true,
 }: InstanceFormProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({});
@@ -79,16 +87,18 @@ export default function InstanceForm({
 
   const OptionalTooltipWrapper = useCallback(
     ({ children }: { children: React.ReactNode }) => {
+      let tooltipMessage = null;
       if (isUpdating) {
-        return (
-          <DaTooltip content="Updating schema is not allowed.">
-            {children}
-          </DaTooltip>
-        );
+        tooltipMessage = 'Updating schema is not allowed.';
+      } else if (!allowSchemaChange) {
+        tooltipMessage = 'Changing schema is not allowed.';
+      }
+      if (tooltipMessage !== null) {
+        return <DaTooltip content={tooltipMessage}>{children}</DaTooltip>;
       }
       return <>{children}</>;
     },
-    [isUpdating]
+    [allowSchemaChange, isUpdating]
   );
 
   const handleSubmitForm = async (schemaId: string, data: any) => {
@@ -104,7 +114,12 @@ export default function InstanceForm({
       try {
         const instance = await createInventoryInstance(schemaId, data);
         toast.success('Instance created successfully!');
-        router.push(`/inventory/instance/${instance.id}`);
+        onSuccess?.(instance);
+        queryClient.invalidateQueries({
+          queryKey: ['listInventoryInstances'],
+        });
+        if (redirectOnSuccess)
+          router.push(`/inventory/instance/${instance.id}`);
       } catch (error) {
         setError((error as Error).message || 'Failed to create instance.');
         setLoading(false);
@@ -116,8 +131,16 @@ export default function InstanceForm({
           setLoading(false);
           return;
         }
-        await updateInventoryInstance(initialData.id, data);
-        router.push(`/inventory/instance/${initialData.id}`);
+        const updatedInstance = await updateInventoryInstance(
+          initialData.id,
+          data
+        );
+        onSuccess?.(updatedInstance);
+        queryClient.invalidateQueries({
+          queryKey: ['listInventoryInstances'],
+        });
+        if (redirectOnSuccess)
+          router.push(`/inventory/instance/${initialData.id}`);
       } catch (error) {
         setError((error as Error).message || 'Failed to update instance.');
         setLoading(false);
@@ -205,7 +228,7 @@ export default function InstanceForm({
         </label>
         <OptionalTooltipWrapper>
           <DaSelect
-            disabled={isUpdating}
+            disabled={isUpdating || !allowSchemaChange}
             value={schemaId}
             onValueChange={(value) => {
               setSchemaId(value);
