@@ -43,7 +43,6 @@ export async function signIn(token: string) {
     const session = encode(sessionUser);
     (await cookies()).set(SESSION_COOKIE_NAME, session, {
       httpOnly: true,
-      secure: true,
       expires: new Date(Date.now() + SESSION_COOKIE_MAX_AGE),
       sameSite: 'lax',
       path: '/',

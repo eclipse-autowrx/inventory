@@ -89,7 +89,7 @@ export type InventoryInstanceUpdatePayload = Partial<
   }
 >;
 
-type InventorySimplifiedSchema = {
+export type InventorySimplifiedSchema = {
   id: string;
   name: string;
 };
@@ -145,4 +145,12 @@ export interface InventoryInstanceRelation {
   metadata: any;
   created_by?: SimplifiedUser;
   description?: string;
+}
+
+export interface InventoryInstanceRelationFormData {
+  relation: string;
+  source: string;
+  target: string;
+  description?: string;
+  metadata?: string;
 }
