@@ -8,6 +8,7 @@ import DeleteRelation from './delete-relation';
 import RelationForm from './relation-form';
 import { useState } from 'react';
 import clsx from 'clsx';
+import Link from 'next/link';
 
 interface RelationItemProps {
   schemaId: string;
@@ -124,9 +125,11 @@ export default function RelationItem({
                       className="absolute top-[13px] -left-[17px] rotate-180"
                     />
                   )}
-                  <button className="truncate w-full block rounded-lg text-sm text-center border p-3">
-                    {processedRelation.target.name}
-                  </button>
+                  <Link href={`/schema/${processedRelation.target.id}`}>
+                    <button className="truncate w-full block rounded-lg text-sm text-center border p-3">
+                      {processedRelation.target.name}
+                    </button>
+                  </Link>
                 </div>
               </ArcherElement>
             </div>
