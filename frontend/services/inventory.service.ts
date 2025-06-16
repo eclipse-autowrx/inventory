@@ -2,6 +2,7 @@
 
 import { apiConfig } from '@/configs/api';
 import { attachAuthApiFetch } from '@/lib/attach-auth-api-fetch';
+import { ServerActionError } from '@/lib/server-action-util';
 import { List } from '@/types/common.type';
 import {
   InventoryInstance,
@@ -26,7 +27,7 @@ export async function getInventorySchemas() {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to fetch schemas:', errorData);
-    throw new Error(errorData.message || 'Failed to fetch schemas');
+    throw new ServerActionError(errorData.message || 'Failed to fetch schemas');
   }
 
   return res.json() as Promise<List<InventorySchema>>;
@@ -40,7 +41,7 @@ export async function getInventorySchema(schemaId: string) {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to fetch schema:', errorData);
-    throw new Error(errorData.message || 'Failed to fetch schema');
+    throw new ServerActionError(errorData.message || 'Failed to fetch schema');
   }
 
   return res.json() as Promise<InventorySchema>;
@@ -58,7 +59,7 @@ export async function createInventorySchema(formData: InventorySchemaFormData) {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to create schema:', errorData);
-    throw new Error(errorData.message || 'Failed to create schema');
+    throw new ServerActionError(errorData.message || 'Failed to create schema');
   }
 
   revalidatePath('/schema', 'page');
@@ -80,7 +81,7 @@ export async function updateInventorySchema(
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to update schema:', errorData);
-    throw new Error(errorData.message || 'Failed to update schema');
+    throw new ServerActionError(errorData.message || 'Failed to update schema');
   }
 
   revalidatePath(`/schema/${schemaId}`, 'page');
@@ -99,7 +100,7 @@ export async function deleteInventorySchema(schemaId: string) {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to delete schema:', errorData);
-    throw new Error(errorData.message || 'Failed to delete schema');
+    throw new ServerActionError(errorData.message || 'Failed to delete schema');
   }
 
   revalidatePath('/schema', 'page');
@@ -116,7 +117,9 @@ export async function getInventoryInstance(id: string) {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to fetch instance:', errorData);
-    throw new Error(errorData.message || 'Failed to fetch instance');
+    throw new ServerActionError(
+      errorData.message || 'Failed to fetch instance'
+    );
   }
 
   return res.json() as Promise<InventoryInstanceDetail>;
@@ -135,7 +138,9 @@ export async function getInventoryInstances(searchParams?: string) {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to fetch instances:', errorData);
-    throw new Error(errorData.message || 'Failed to fetch instances');
+    throw new ServerActionError(
+      errorData.message || 'Failed to fetch instances'
+    );
   }
 
   return res.json() as Promise<List<InventoryInstance>>;
@@ -162,7 +167,9 @@ export async function createInventoryInstance(
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to create instance:', errorData);
-    throw new Error(errorData.message || 'Failed to create instance');
+    throw new ServerActionError(
+      errorData.message || 'Failed to create instance'
+    );
   }
 
   revalidatePath('/instance', 'page');
@@ -195,7 +202,9 @@ export async function updateInventoryInstance(
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to update instance:', errorData);
-    throw new Error(errorData.message || 'Failed to update instance');
+    throw new ServerActionError(
+      errorData.message || 'Failed to update instance'
+    );
   }
 
   revalidatePath('/instance', 'page');
@@ -214,7 +223,9 @@ export async function deleteInventoryInstance(instanceId: string) {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to delete instance:', errorData);
-    throw new Error(errorData.message || 'Failed to delete instance');
+    throw new ServerActionError(
+      errorData.message || 'Failed to delete instance'
+    );
   }
 
   revalidatePath('/instance', 'page');
@@ -240,7 +251,9 @@ export async function createInventoryRelation(data: InventoryRelationFormData) {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to create relation:', errorData);
-    throw new Error(errorData.message || 'Failed to create relation');
+    throw new ServerActionError(
+      errorData.message || 'Failed to create relation'
+    );
   }
 
   revalidateTag('inventory-relations');
@@ -266,7 +279,9 @@ export async function updateInventoryRelation(
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to update relation:', errorData);
-    throw new Error(errorData.message || 'Failed to update relation');
+    throw new ServerActionError(
+      errorData.message || 'Failed to update relation'
+    );
   }
 
   revalidateTag('inventory-relations');
@@ -295,7 +310,9 @@ export async function getInventoryRelations(
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to fetch relations:', errorData);
-    throw new Error(errorData.message || 'Failed to fetch relations');
+    throw new ServerActionError(
+      errorData.message || 'Failed to fetch relations'
+    );
   }
 
   return res.json() as Promise<List<InventoryRelation>>;
@@ -312,7 +329,9 @@ export async function deleteInventoryRelation(id: string) {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to delete relation:', errorData);
-    throw new Error(errorData.message || 'Failed to delete relation');
+    throw new ServerActionError(
+      errorData.message || 'Failed to delete relation'
+    );
   }
 
   revalidateTag('inventory-relations');
@@ -341,7 +360,9 @@ export async function getInventoryInstanceRelations(params?: {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to get instance relations:', errorData);
-    throw new Error(errorData.message || 'Failed to get instance relations');
+    throw new ServerActionError(
+      errorData.message || 'Failed to get instance relations'
+    );
   }
 
   return res.json() as Promise<List<InventoryInstanceRelation>>;
@@ -361,7 +382,9 @@ export async function createInventoryInstanceRelation(
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to create instance relation:', errorData);
-    throw new Error(errorData.message || 'Failed to create instance relation');
+    throw new ServerActionError(
+      errorData.message || 'Failed to create instance relation'
+    );
   }
 
   revalidateTag('inventory-instance-relations');
@@ -379,7 +402,9 @@ export async function deleteInventoryInstanceRelation(id: string) {
   if (!res.ok) {
     const errorData = await res.json();
     console.error('Failed to delete instance relation:', errorData);
-    throw new Error(errorData.message || 'Failed to delete instance relation');
+    throw new ServerActionError(
+      errorData.message || 'Failed to delete instance relation'
+    );
   }
 
   revalidateTag('inventory-instance-relations');

@@ -3,6 +3,7 @@
 import { DaButton } from '@/components/atoms/DaButton';
 import DaPopup from '@/components/atoms/DaPopup';
 import DaText from '@/components/atoms/DaText';
+import { withServerActionHandler } from '@/lib/server-action-util';
 import { deleteInventorySchema } from '@/services/inventory.service';
 import { InventorySchema } from '@/types/inventory.type';
 import Link from 'next/link';
@@ -22,7 +23,12 @@ export default function SchemaItem({ schema, currentUserId }: SchemaItemProps) {
   const handleDelete = async (schemaId: string) => {
     try {
       setLoading(true);
-      await deleteInventorySchema(schemaId);
+      const response = await withServerActionHandler(deleteInventorySchema)(
+        schemaId
+      );
+      if (!response.success) {
+        throw new Error(response.errorMessage);
+      }
       toast.success('Deleted schema successfully!');
     } catch (err: unknown) {
       toast.error((err as Error).message || 'Failed to delete schema.');

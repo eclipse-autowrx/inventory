@@ -3,6 +3,7 @@
 import { DaButton } from '@/components/atoms/DaButton';
 import DaPopup from '@/components/atoms/DaPopup';
 import DaText from '@/components/atoms/DaText';
+import { withServerActionHandler } from '@/lib/server-action-util';
 import { deleteInventoryInstanceRelation } from '@/services/inventory.service';
 import { InventoryInstanceRelation } from '@/types/inventory.type';
 import { useMutation } from '@tanstack/react-query';
@@ -19,8 +20,14 @@ export default function DeleteInstanceRelation({
 }: DeleteInstanceRelationProps) {
   const open = useState(false);
   const deleteInstanceRelationMutation = useMutation({
-    mutationFn() {
-      return deleteInventoryInstanceRelation(instanceRelation.id);
+    async mutationFn() {
+      const response = await withServerActionHandler(
+        deleteInventoryInstanceRelation
+      )(instanceRelation.id);
+      if (!response.success) {
+        throw new Error(response.errorMessage);
+      }
+      return response.result;
     },
     onSuccess() {
       open[1](false);

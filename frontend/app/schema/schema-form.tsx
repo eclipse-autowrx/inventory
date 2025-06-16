@@ -4,6 +4,7 @@ import { DaButton } from '@/components/atoms/DaButton';
 import { DaInput } from '@/components/atoms/DaInput';
 import { DaSkeleton } from '@/components/atoms/DaSkeleton';
 import { DaTextarea } from '@/components/atoms/DaTextarea';
+import { withServerActionHandler } from '@/lib/server-action-util';
 import {
   createInventorySchema,
   updateInventorySchema,
@@ -121,7 +122,14 @@ const InventorySchemaForm: React.FC<SchemaFormProps> = ({
   const handleCreateSchema: (
     formData: InventorySchemaFormData
   ) => Promise<InventorySchema> = async (formData) => {
-    const newSchema = await createInventorySchema(formData);
+    const response = await withServerActionHandler(createInventorySchema)(
+      formData
+    );
+    if (!response.success) {
+      throw new Error(response.errorMessage);
+    }
+
+    const newSchema = response.result;
     if (redirectOnSuccess) {
       router.push(`/schema/${newSchema.id}`);
     }
@@ -134,7 +142,15 @@ const InventorySchemaForm: React.FC<SchemaFormProps> = ({
     if (!initialData) {
       throw new Error('Initial data is required for updates.');
     }
-    const updatedSchema = await updateInventorySchema(initialData.id, formData);
+    const response = await withServerActionHandler(updateInventorySchema)(
+      initialData.id,
+      formData
+    );
+    if (!response.success) {
+      throw new Error(response.errorMessage);
+    }
+    const updatedSchema = response.result;
+
     if (redirectOnSuccess) {
       router.push(`/schema/${initialData.id}`);
     }

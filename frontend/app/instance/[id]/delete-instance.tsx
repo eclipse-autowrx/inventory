@@ -3,6 +3,7 @@
 import { DaButton } from '@/components/atoms/DaButton';
 import DaPopup from '@/components/atoms/DaPopup';
 import DaText from '@/components/atoms/DaText';
+import { withServerActionHandler } from '@/lib/server-action-util';
 import { deleteInventoryInstance } from '@/services/inventory.service';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -22,7 +23,12 @@ export default function DeleteInstance({ instanceId }: DeleteInstanceProps) {
     if (instanceId) {
       try {
         setLoading(true);
-        await deleteInventoryInstance(instanceId);
+        const response = await withServerActionHandler(deleteInventoryInstance)(
+          instanceId
+        );
+        if (!response.success) {
+          throw new Error(response.errorMessage);
+        }
         toast.success('Deleted instance successfully!');
         router.push('/instance');
       } catch (err: unknown) {
