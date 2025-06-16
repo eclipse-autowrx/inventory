@@ -9,6 +9,13 @@ import {
   InventoryRelation,
 } from '@/types/inventory.type';
 import InstanceRelationForm from './instance-relation-form';
+import Link from 'next/link';
+import DaTooltip from '@/components/atoms/DaTooltip';
+import { DaButton } from '@/components/atoms/DaButton';
+import { TbEdit } from 'react-icons/tb';
+import DeleteInstanceRelation from './delete-instance-relation';
+import { getServerSession } from '@/lib/auth/server-session-auth';
+import { Session } from '@/types/session.type';
 
 interface InstanceRelationListProps {
   instanceId: string;
@@ -40,7 +47,7 @@ export default async function InstanceRelationList({
   return (
     <div>
       {outgoingRelations.map((relation) => (
-        <InstanceRelationItem
+        <RelationItem
           relation={relation}
           instanceId={instanceId}
           key={relation.id}
@@ -50,19 +57,27 @@ export default async function InstanceRelationList({
   );
 }
 
-async function InstanceRelationItem({
+async function RelationItem({
   relation,
   instanceId,
 }: {
   relation: InventoryRelation;
   instanceId: string;
 }) {
+  let currentUserSession: Session | undefined;
   let instanceRelations: List<InventoryInstanceRelation>;
   try {
-    instanceRelations = await getInventoryInstanceRelations({
-      relation: relation.id,
-      source: instanceId,
-    });
+    const promises: [
+      Promise<Session | undefined>,
+      Promise<List<InventoryInstanceRelation>>
+    ] = [
+      getServerSession(),
+      getInventoryInstanceRelations({
+        relation: relation.id,
+        source: instanceId,
+      }),
+    ];
+    [currentUserSession, instanceRelations] = await Promise.all(promises);
   } catch (error) {
     console.error('Failed to fetch relations:', error);
     return (
@@ -83,11 +98,6 @@ async function InstanceRelationItem({
         <DaText variant="regular-bold">
           {relation.name} {relation.target.name}
         </DaText>
-
-        {/* <DaButton size="sm" variant="outline-nocolor">
-          <TbPlus className="mr-1" />
-          Add Element
-        </DaButton> */}
       </div>
       <InstanceRelationForm
         currentInstanceId={instanceId}
@@ -95,18 +105,79 @@ async function InstanceRelationItem({
         excludedInstanceIds={excludedInstanceIds}
         relation={relation}
       />
-      <div className="border-t my-6" />
-
+      <div className="border-t mt-6 my-5" />
       {instanceRelations.results.length === 0 ? (
         <DaText variant="small">
           There&apos;s currently no relationship for this type.
         </DaText>
       ) : (
-        <>
-          {instanceRelations.results.map((instanceRelation) => (
-            <div key={instanceRelation.id}>{instanceRelation.description}</div>
-          ))}
-        </>
+        <div>
+          <div className="flex h-12 gap-x-4 items-center">
+            <div className="text-da-gray-darkest font-semibold flex-1">
+              Target Name
+            </div>
+            <div className="text-da-gray-darkest font-semibold flex-1">
+              Description
+            </div>
+            <div className="text-da-gray-darkest font-semibold flex-1">
+              Metadata
+            </div>
+            <div className="text-da-gray-darkest font-semibold min-w-14">
+              Actions
+            </div>
+          </div>
+          <ul>
+            {instanceRelations.results.map((instanceRelation) => (
+              <li
+                className="flex h-12 gap-x-4 border-t border-dashed items-center"
+                key={instanceRelation.id}
+              >
+                <div className="flex-1">
+                  <DaTooltip content={instanceRelation.target.name}>
+                    <Link
+                      className="text-da-gray-darkest h-12 line-clamp-1 flex items-center hover:underline hover:text-da-primary-500"
+                      href={`/instance/${instanceRelation.target.id}`}
+                    >
+                      {instanceRelation.target.name}
+                    </Link>
+                  </DaTooltip>
+                </div>
+                <div className="flex-1">
+                  {instanceRelation.description && (
+                    <DaTooltip content={instanceRelation.description}>
+                      <div className="line-clamp-1 flex items-center h-10">
+                        {instanceRelation.description}
+                      </div>
+                    </DaTooltip>
+                  )}
+                </div>
+                <div className="flex-1">
+                  {instanceRelation.metadata && (
+                    <DaTooltip content={instanceRelation.metadata}>
+                      <div className="line-clamp-1 flex items-center h-10">
+                        {instanceRelation.metadata}
+                      </div>
+                    </DaTooltip>
+                  )}
+                </div>
+                <div className="min-w-14">
+                  {currentUserSession?.id &&
+                    currentUserSession.id ===
+                      instanceRelation.created_by?.id && (
+                      <>
+                        <DaButton size="sm" variant="plain">
+                          <TbEdit size={16} />
+                        </DaButton>
+                        <DeleteInstanceRelation
+                          instanceRelation={instanceRelation}
+                        />
+                      </>
+                    )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
