@@ -4,22 +4,21 @@ import Link from 'next/link';
 import { TbCirclePlus } from 'react-icons/tb';
 import SchemaItem from './schema-item';
 import { getInventorySchemas } from '@/services/inventory.service';
-import { InventorySchema } from '@/types/inventory.type';
-import { List } from '@/types/common.type';
 
 export default async function PageSchema() {
   const session = await getServerSession();
 
-  let schemas: List<InventorySchema>;
-  try {
-    schemas = await getInventorySchemas();
-  } catch {
+  const response = await getInventorySchemas();
+  if (!response.success) {
+    console.error('Failed to fetch schemas:', response.errorMessage);
     return (
       <div className="w-full min-h-[280px] flex items-center justify-center">
         Failed to fetch schemas.
       </div>
     );
   }
+
+  const schemas = response.result;
 
   return (
     <div className="container mx-auto p-4">

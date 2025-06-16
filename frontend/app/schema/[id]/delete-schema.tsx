@@ -3,7 +3,6 @@
 import { DaButton } from '@/components/atoms/DaButton';
 import DaPopup from '@/components/atoms/DaPopup';
 import DaText from '@/components/atoms/DaText';
-import { withServerActionHandler } from '@/lib/server-action-utils';
 import { deleteInventorySchema } from '@/services/inventory.service';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -23,9 +22,7 @@ export default function DeleteSchema({ schemaId }: SchemaActionsProps) {
     if (schemaId) {
       try {
         setLoading(true);
-        const response = await withServerActionHandler(
-          deleteInventorySchema(schemaId)
-        );
+        const response = await deleteInventorySchema(schemaId);
         if (!response.success) {
           throw new Error(response.errorMessage);
         }

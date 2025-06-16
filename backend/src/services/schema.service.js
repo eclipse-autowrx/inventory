@@ -7,13 +7,12 @@ const ParsedJsonPropertiesMongooseListDecorator = require('../decorators/ParsedJ
 const { buildMongoSearchFilter } = require('../utils/queryUtils');
 const InterservicePopulateDecorator = require('../decorators/InterservicePopulateDecorator');
 
-const ajv = new Ajv();
-
 /**
  *
  * @param {string} schemaDefinition
  */
 const validateSchemaDefinition = async (schemaDefinition) => {
+  const ajv = new Ajv();
   try {
     const schema = JSON.parse(schemaDefinition);
     const validate = ajv.compile(schema);

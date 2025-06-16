@@ -2,7 +2,6 @@ import { DaButton } from '@/components/atoms/DaButton';
 import DaText from '@/components/atoms/DaText';
 import DaUserProfile from '@/components/molecules/DaUserProfile';
 import { getServerSession } from '@/lib/auth/server-session-auth';
-import { InventoryRelation, InventorySchema } from '@/types/inventory.type';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { TbEdit, TbList, TbPlus } from 'react-icons/tb';
@@ -12,7 +11,6 @@ import {
   getInventoryRelations,
   getInventorySchema,
 } from '@/services/inventory.service';
-import { List } from '@/types/common.type';
 import RelationItem from './(relation)/relation-item';
 import { Fragment } from 'react';
 
@@ -28,12 +26,9 @@ export default async function PageSchemaDetail({
   const { id } = await params;
 
   const session = await getServerSession();
-
-  let schema: InventorySchema;
-  try {
-    schema = await getInventorySchema(id);
-  } catch (error) {
-    console.error('Error fetching schema:', error);
+  const response = await getInventorySchema(id);
+  if (!response.success) {
+    console.error('Error fetching schema:', response.errorMessage);
     return (
       <div className="container mx-auto p-4">
         <DaText variant="title" className="text-red-500">
@@ -42,6 +37,8 @@ export default async function PageSchemaDetail({
       </div>
     );
   }
+
+  const schema = response.result;
 
   return (
     <div className="container mx-auto p-4">
@@ -129,11 +126,8 @@ interface RelationListProps {
   schemaId: string;
 }
 async function RelationList({ schemaId }: RelationListProps) {
-  let outgoingRelations: List<InventoryRelation>,
-    incomingRelations: List<InventoryRelation>;
-
-  try {
-    [outgoingRelations, incomingRelations] = await Promise.all([
+  const [outgoingRelationsResponse, incomingRelationsResponse] =
+    await Promise.all([
       getInventoryRelations({
         source: schemaId,
       }),
@@ -141,19 +135,40 @@ async function RelationList({ schemaId }: RelationListProps) {
         target: schemaId,
       }),
     ]);
-    incomingRelations.results = incomingRelations.results.filter(
-      (relation) => relation.source.id !== relation.target.id
+
+  if (!outgoingRelationsResponse.success) {
+    console.error(
+      'Error fetching outgoing relations:',
+      outgoingRelationsResponse.errorMessage
     );
-  } catch (error) {
-    console.error('Error fetching relations:', error);
     return (
       <div className="container mx-auto p-4">
         <DaText variant="title" className="text-red-500">
-          Error fetching relations.
+          Error fetching outgoing relations.
         </DaText>
       </div>
     );
   }
+
+  if (!incomingRelationsResponse.success) {
+    console.error(
+      'Error fetching incoming relations:',
+      incomingRelationsResponse.errorMessage
+    );
+    return (
+      <div className="container mx-auto p-4">
+        <DaText variant="title" className="text-red-500">
+          Error fetching incoming relations.
+        </DaText>
+      </div>
+    );
+  }
+
+  const outgoingRelations = outgoingRelationsResponse.result;
+  const incomingRelations = incomingRelationsResponse.result;
+  incomingRelations.results = incomingRelations.results.filter(
+    (relation) => relation.source.id !== relation.target.id
+  );
 
   if (
     outgoingRelations.results.length === 0 &&

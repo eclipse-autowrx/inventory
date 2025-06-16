@@ -1,6 +1,5 @@
 import DaText from '@/components/atoms/DaText';
 import { getInventorySchema } from '@/services/inventory.service';
-import { InventorySchema } from '@/types/inventory.type';
 import InventorySchemaForm from '../../schema-form';
 
 interface PageEditSchemaProps {
@@ -12,17 +11,17 @@ interface PageEditSchemaProps {
 export default async function PageEditSchema({ params }: PageEditSchemaProps) {
   const { id } = await params;
 
-  let schema: InventorySchema;
-  try {
-    schema = await getInventorySchema(id);
-  } catch (error) {
-    console.error('Failed to fetch schema:', error);
+  const response = await getInventorySchema(id);
+  if (!response.success) {
+    console.error('Failed to fetch schema:', response.errorMessage);
     return (
       <div className="w-full min-h-[280px] flex items-center justify-center">
         Failed to fetch schemas.
       </div>
     );
   }
+
+  const schema = response.result;
 
   return (
     <div className="max-w-[1600px] mx-auto p-12">

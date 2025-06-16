@@ -29,7 +29,6 @@ import {
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { DaSkeleton } from '@/components/atoms/DaSkeleton';
-import { withServerActionHandler } from '@/lib/server-action-utils';
 
 const CodeEditorWithSize = lazy(
   () => import('@/components/molecules/CodeEditorWithSize')
@@ -124,9 +123,7 @@ export default function InstanceForm({
 
     if (!isUpdating) {
       try {
-        const response = await withServerActionHandler(
-          createInventoryInstance(schemaId, data)
-        );
+        const response = await createInventoryInstance(schemaId, data);
         if (!response.success) {
           throw new Error(response.errorMessage);
         }
@@ -136,8 +133,7 @@ export default function InstanceForm({
         queryClient.invalidateQueries({
           queryKey: ['listInventoryInstances'],
         });
-        if (redirectOnSuccess)
-          router.push(`/inventory/instance/${instance.id}`);
+        if (redirectOnSuccess) router.push(`/instance/${instance.id}`);
       } catch (error) {
         setError((error as Error).message || 'Failed to create instance.');
         setLoading(false);
@@ -149,9 +145,7 @@ export default function InstanceForm({
           setLoading(false);
           return;
         }
-        const response = await withServerActionHandler(
-          updateInventoryInstance(initialData.id, data)
-        );
+        const response = await updateInventoryInstance(initialData.id, data);
         if (!response.success) {
           throw new Error(response.errorMessage);
         }
@@ -160,8 +154,7 @@ export default function InstanceForm({
         queryClient.invalidateQueries({
           queryKey: ['listInventoryInstances'],
         });
-        if (redirectOnSuccess)
-          router.push(`/inventory/instance/${initialData.id}`);
+        if (redirectOnSuccess) router.push(`/instance/${initialData.id}`);
       } catch (error) {
         setError((error as Error).message || 'Failed to update instance.');
         setLoading(false);

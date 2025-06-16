@@ -4,7 +4,6 @@ import { DaButton } from '@/components/atoms/DaButton';
 import { DaInput } from '@/components/atoms/DaInput';
 import { DaSkeleton } from '@/components/atoms/DaSkeleton';
 import { DaTextarea } from '@/components/atoms/DaTextarea';
-import { withServerActionHandler } from '@/lib/server-action-utils';
 import {
   createInventorySchema,
   updateInventorySchema,
@@ -122,9 +121,7 @@ const InventorySchemaForm: React.FC<SchemaFormProps> = ({
   const handleCreateSchema: (
     formData: InventorySchemaFormData
   ) => Promise<InventorySchema> = async (formData) => {
-    const response = await withServerActionHandler(
-      createInventorySchema(formData)
-    );
+    const response = await createInventorySchema(formData);
     if (!response.success) {
       throw new Error(response.errorMessage);
     }
@@ -142,9 +139,7 @@ const InventorySchemaForm: React.FC<SchemaFormProps> = ({
     if (!initialData) {
       throw new Error('Initial data is required for updates.');
     }
-    const response = await withServerActionHandler(
-      updateInventorySchema(initialData.id, formData)
-    );
+    const response = await updateInventorySchema(initialData.id, formData);
     if (!response.success) {
       throw new Error(response.errorMessage);
     }

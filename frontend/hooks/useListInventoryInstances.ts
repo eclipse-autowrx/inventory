@@ -8,9 +8,14 @@ export default function useListInventoryInstances(params?: {
 
   return useQuery({
     queryKey: ['listInventoryInstances', params],
-    queryFn: () =>
-      getInventoryInstances(
+    queryFn: async () => {
+      const response = await getInventoryInstances(
         searchParams.size === 0 ? '' : searchParams.toString()
-      ),
+      );
+      if (!response.success) {
+        throw new Error(response.errorMessage || 'Failed to fetch instances');
+      }
+      return response.result;
+    },
   });
 }

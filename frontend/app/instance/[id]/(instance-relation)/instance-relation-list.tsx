@@ -3,11 +3,7 @@ import {
   getInventoryInstanceRelations,
   getInventoryRelations,
 } from '@/services/inventory.service';
-import { List } from '@/types/common.type';
-import {
-  InventoryInstanceRelation,
-  InventoryRelation,
-} from '@/types/inventory.type';
+import { InventoryRelation } from '@/types/inventory.type';
 import InstanceRelationForm from './instance-relation-form';
 import Link from 'next/link';
 import DaTooltip from '@/components/atoms/DaTooltip';
@@ -15,7 +11,6 @@ import { DaButton } from '@/components/atoms/DaButton';
 import { TbEdit } from 'react-icons/tb';
 import DeleteInstanceRelation from './delete-instance-relation';
 import { getServerSession } from '@/lib/auth/server-session-auth';
-import { Session } from '@/types/session.type';
 
 interface InstanceRelationListProps {
   instanceId: string;
@@ -26,19 +21,18 @@ export default async function InstanceRelationList({
   instanceId,
   schemaId,
 }: InstanceRelationListProps) {
-  let relations: List<InventoryRelation>;
-  try {
-    relations = await getInventoryRelations({
-      source: schemaId,
-    });
-  } catch (error) {
-    console.error('Failed to fetch relations:', error);
+  const response = await getInventoryRelations({
+    source: schemaId,
+  });
+  if (!response.success) {
+    console.error('Failed to fetch relations:', response.errorMessage);
     return (
       <div className="w-full min-h-[280px] flex items-center justify-center">
         Failed to fetch relations.
       </div>
     );
   }
+  const relations = response.result;
 
   const outgoingRelations = relations.results.filter(
     (relation) => relation.source.id === schemaId
@@ -64,28 +58,21 @@ async function RelationItem({
   relation: InventoryRelation;
   instanceId: string;
 }) {
-  let currentUserSession: Session | undefined;
-  let instanceRelations: List<InventoryInstanceRelation>;
-  try {
-    const promises: [
-      Promise<Session | undefined>,
-      Promise<List<InventoryInstanceRelation>>
-    ] = [
-      getServerSession(),
-      getInventoryInstanceRelations({
-        relation: relation.id,
-        source: instanceId,
-      }),
-    ];
-    [currentUserSession, instanceRelations] = await Promise.all(promises);
-  } catch (error) {
-    console.error('Failed to fetch relations:', error);
+  const currentUserSession = await getServerSession();
+  const response = await getInventoryInstanceRelations({
+    relation: relation.id,
+    source: instanceId,
+  });
+  if (!response.success) {
+    console.error('Failed to fetch relations:', response.errorMessage);
     return (
       <div className="w-full min-h-[280px] flex items-center justify-center">
         Failed to fetch instance relations.
       </div>
     );
   }
+
+  const instanceRelations = response.result;
 
   const excludedInstanceIds = new Set<string>([
     instanceId,

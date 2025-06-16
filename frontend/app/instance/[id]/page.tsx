@@ -20,17 +20,16 @@ export default async function PageInstanceDetail({
   params,
 }: PageInstanceDetailProps) {
   const { id } = await params;
-  let instance: InventoryInstanceDetail;
-  try {
-    instance = await getInventoryInstance(id);
-  } catch (error) {
-    console.error('Failed to fetch instance:', error);
+  const response = await getInventoryInstance(id);
+  if (!response.success) {
+    console.error('Failed to fetch instance:', response.errorMessage);
     return (
       <div className="w-full min-h-[280px] flex items-center justify-center">
         Failed to fetch instance details.
       </div>
     );
   }
+  const instance = response.result;
 
   return (
     <div className="container text-sm pb-10 text-da-gray-dark">
