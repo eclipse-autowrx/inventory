@@ -132,7 +132,11 @@ const getInstanceRelationById = async (id) => {
   if (!instanceRelation) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Instance relation not found');
   }
-  return new ParsedJsonPropertiesMongooseDecorator(instanceRelation, 'source.data', 'target.data').getParsedPropertiesData();
+  return new InterservicePopulateListDecorator(
+    new ParsedJsonPropertiesMongooseDecorator(instanceRelation, 'source.data', 'target.data').getParsedPropertiesData(),
+  )
+    .populate('created_by')
+    .getSinglePopulatedDoc();
 };
 
 /**
