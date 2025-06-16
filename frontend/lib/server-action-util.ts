@@ -1,3 +1,5 @@
+'use server';
+
 export type ServerActionResult<T> =
   | {
       success: true;
