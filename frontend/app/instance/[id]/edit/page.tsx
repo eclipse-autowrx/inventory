@@ -1,6 +1,5 @@
 import DaText from '@/components/atoms/DaText';
 import { getInventoryInstance } from '@/services/inventory.service';
-import { InventoryInstanceDetail } from '@/types/inventory.type';
 import InstanceForm from '../../instance-form';
 
 interface PageEditInstanceProps {
@@ -13,17 +12,16 @@ export default async function PageEditInstance({
   params,
 }: PageEditInstanceProps) {
   const { id } = await params;
-  let instance: InventoryInstanceDetail;
-  try {
-    instance = await getInventoryInstance(id);
-  } catch (error) {
-    console.error('Failed to fetch instance:', error);
+  const response = await getInventoryInstance(id);
+  if (!response.success) {
+    console.error('Failed to fetch instance:', response.errorMessage);
     return (
       <div className="w-full min-h-[280px] flex items-center justify-center">
         Failed to fetch instance details.
       </div>
     );
   }
+  const instance = response.result;
 
   return (
     <div className="max-w-[1600px] mx-auto p-12">

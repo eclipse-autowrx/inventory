@@ -3,7 +3,6 @@ const Ajv = require('ajv');
 const { Instance, Schema } = require('../models');
 const ApiError = require('../utils/ApiError');
 
-const ajv = new Ajv();
 const schemaService = require('./schema.service');
 const ParsedJsonPropertiesMongooseDecorator = require('../decorators/ParsedJsonPropertiesMongooseDecorator');
 const ParsedJsonPropertiesMongooseListDecorator = require('../decorators/ParsedJsonPropertiesMongooseListDecorator');
@@ -16,6 +15,7 @@ const InterservicePopulateListDecorator = require('../decorators/InterservicePop
  * @param {string} data
  */
 const validateDataAgainstSchema = async (schemaId, data) => {
+  const ajv = new Ajv();
   const schema = await Schema.findById(schemaId);
   if (!schema) {
     throw new ApiError(httpStatus.BAD_REQUEST, `Schema with id ${schemaId} not found for validation`);

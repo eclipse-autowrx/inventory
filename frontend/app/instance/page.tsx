@@ -2,8 +2,6 @@ import {
   getInventoryInstances,
   getInventorySchemas,
 } from '@/services/inventory.service';
-import { List } from '@/types/common.type';
-import { InventoryInstance, InventorySchema } from '@/types/inventory.type';
 import Filter from './filter';
 import DaText from '@/components/atoms/DaText';
 import Link from 'next/link';
@@ -33,22 +31,37 @@ export default async function PageInstances(props: PageInstancesProps) {
   const searchParams = (await props.searchParams) || {};
   const { search: querySearch, page } = searchParams;
 
-  let instances: List<InventoryInstance>;
-  let schemas: List<InventorySchema>;
+  const [instancesResponse, schemasResponse] = await Promise.all([
+    getInventoryInstances(new URLSearchParams(searchParams).toString()),
+    getInventorySchemas(),
+  ]);
 
-  try {
-    [instances, schemas] = await Promise.all([
-      getInventoryInstances(new URLSearchParams(searchParams).toString()),
-      getInventorySchemas(),
-    ]);
-  } catch (error) {
-    console.error('Failed to fetch inventory instances:', error);
+  if (!instancesResponse.success) {
+    console.error(
+      'Failed to fetch inventory instances:',
+      instancesResponse.errorMessage
+    );
     return (
       <div className="w-full min-h-[280px] flex items-center justify-center">
-        Failed to fetch instances or schemas.
+        Failed to fetch instances.
       </div>
     );
   }
+
+  if (!schemasResponse.success) {
+    console.error(
+      'Failed to fetch inventory schemas:',
+      schemasResponse.errorMessage
+    );
+    return (
+      <div className="w-full min-h-[280px] flex items-center justify-center">
+        Failed to fetch schemas.
+      </div>
+    );
+  }
+
+  const instances = instancesResponse.result;
+  const schemas = schemasResponse.result;
 
   const handlePageChange = (newPage: number) => {
     // Ensure newPage is valid
