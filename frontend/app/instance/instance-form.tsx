@@ -29,6 +29,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { DaSkeleton } from '@/components/atoms/DaSkeleton';
+import { withServerActionHandler } from '@/lib/server-action-util';
 
 const CodeEditorWithSize = lazy(
   () => import('@/components/molecules/CodeEditorWithSize')
@@ -123,7 +124,14 @@ export default function InstanceForm({
 
     if (!isUpdating) {
       try {
-        const instance = await createInventoryInstance(schemaId, data);
+        const response = await withServerActionHandler(createInventoryInstance)(
+          schemaId,
+          data
+        );
+        if (!response.success) {
+          throw new Error(response.errorMessage);
+        }
+        const instance = response.result;
         toast.success('Instance created successfully!');
         onSuccess?.(instance);
         queryClient.invalidateQueries({
@@ -142,10 +150,14 @@ export default function InstanceForm({
           setLoading(false);
           return;
         }
-        const updatedInstance = await updateInventoryInstance(
+        const response = await withServerActionHandler(updateInventoryInstance)(
           initialData.id,
           data
         );
+        if (!response.success) {
+          throw new Error(response.errorMessage);
+        }
+        const updatedInstance = response.result;
         onSuccess?.(updatedInstance);
         queryClient.invalidateQueries({
           queryKey: ['listInventoryInstances'],
