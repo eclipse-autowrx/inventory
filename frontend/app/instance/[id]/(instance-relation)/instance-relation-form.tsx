@@ -13,7 +13,7 @@ import { useRef, useState } from 'react';
 import { useController, useForm } from 'react-hook-form';
 import { TbLoader, TbPlus } from 'react-icons/tb';
 import InstanceCombobox from './instance-combobox';
-import { withServerActionHandler } from '@/lib/server-action-util';
+import { withServerActionHandler } from '@/lib/server-action-utils';
 
 interface InstanceRelationFormProps {
   currentInstanceId: string;
@@ -45,8 +45,8 @@ export default function InstanceRelationForm({
   const instanceRelationMutation = useMutation({
     mutationFn: async (data: InventoryInstanceRelationFormData) => {
       const response = await withServerActionHandler(
-        createInventoryInstanceRelation
-      )(data);
+        createInventoryInstanceRelation(data)
+      );
       if (!response.success) {
         throw new Error(response.errorMessage);
       }

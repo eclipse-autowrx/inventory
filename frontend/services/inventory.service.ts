@@ -2,7 +2,7 @@
 
 import { apiConfig } from '@/configs/api';
 import { attachAuthApiFetch } from '@/lib/attach-auth-api-fetch';
-import { ServerActionError } from '@/lib/server-action-util';
+import { ServerActionError } from '@/lib/server-action-types';
 import { List } from '@/types/common.type';
 import {
   InventoryInstance,

@@ -3,7 +3,7 @@
 import { DaButton } from '@/components/atoms/DaButton';
 import DaPopup from '@/components/atoms/DaPopup';
 import DaText from '@/components/atoms/DaText';
-import { withServerActionHandler } from '@/lib/server-action-util';
+import { withServerActionHandler } from '@/lib/server-action-utils';
 import { deleteInventorySchema } from '@/services/inventory.service';
 import { InventorySchema } from '@/types/inventory.type';
 import Link from 'next/link';
@@ -23,8 +23,8 @@ export default function SchemaItem({ schema, currentUserId }: SchemaItemProps) {
   const handleDelete = async (schemaId: string) => {
     try {
       setLoading(true);
-      const response = await withServerActionHandler(deleteInventorySchema)(
-        schemaId
+      const response = await withServerActionHandler(
+        deleteInventorySchema(schemaId)
       );
       if (!response.success) {
         throw new Error(response.errorMessage);

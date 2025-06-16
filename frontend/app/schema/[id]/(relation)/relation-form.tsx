@@ -19,7 +19,7 @@ import {
   updateInventoryRelation,
 } from '@/services/inventory.service';
 import DaLoader from '@/components/atoms/DaLoader';
-import { withServerActionHandler } from '@/lib/server-action-util';
+import { withServerActionHandler } from '@/lib/server-action-utils';
 
 interface RelationFormProps {
   className?: string;
@@ -76,8 +76,8 @@ export default function RelationForm({
       if (data.source_cardinality === 'n/a') data.source_cardinality = null;
       if (data.target_cardinality === 'n/a') data.target_cardinality = null;
       if (!isUpdating) {
-        const response = await withServerActionHandler(createInventoryRelation)(
-          data
+        const response = await withServerActionHandler(
+          createInventoryRelation(data)
         );
         if (!response.success) {
           throw new Error(response.errorMessage);
@@ -94,9 +94,8 @@ export default function RelationForm({
       if (!initialData) {
         throw new Error('Initial data is required for updating relation.');
       }
-      const response = await withServerActionHandler(updateInventoryRelation)(
-        initialData.id,
-        updatedData
+      const response = await withServerActionHandler(
+        updateInventoryRelation(initialData.id, updatedData)
       );
       if (!response.success) {
         throw new Error(response.errorMessage);
