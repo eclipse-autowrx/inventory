@@ -367,3 +367,20 @@ export async function createInventoryInstanceRelation(
   revalidateTag('inventory-instance-relations');
   return res.json() as Promise<InventoryInstanceRelation>;
 }
+
+export async function deleteInventoryInstanceRelation(id: string) {
+  const res = await attachAuthApiFetch(
+    `${apiConfig.baseUrl}/inventory/instance-relations/${id}`,
+    {
+      method: 'DELETE',
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error('Failed to delete instance relation:', errorData);
+    throw new Error(errorData.message || 'Failed to delete instance relation');
+  }
+
+  revalidateTag('inventory-instance-relations');
+}
