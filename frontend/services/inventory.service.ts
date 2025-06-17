@@ -15,6 +15,7 @@ import {
   InventoryRelationFormData,
   InventorySchema,
   InventorySchemaFormData,
+  InventoryInstanceRelationUpdatePayload,
 } from '@/types/inventory.type';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
@@ -622,6 +623,45 @@ export async function deleteInventoryInstanceRelation(
     return { success: true, result: undefined };
   } catch (error) {
     console.error('Error deleting instance relation:', error);
+    return {
+      success: false,
+      errorMessage:
+        error instanceof Error ? error.message : 'Unknown error occurred',
+    };
+  }
+}
+
+export async function updateInventoryInstanceRelation(
+  id: string,
+  body: InventoryInstanceRelationFormData
+) {
+  try {
+    const payload: InventoryInstanceRelationUpdatePayload = {
+      description: body.description,
+      metadata: body.metadata,
+    };
+
+    const res = await attachAuthApiFetch(
+      `${apiConfig.baseUrl}/inventory/instance-relations/${id}`,
+      {
+        method: 'PATCH',
+        body: payload,
+      }
+    );
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error('Failed to update instance relation:', errorData);
+      return {
+        success: false,
+        errorMessage: errorData.message || 'Failed to update instance relation',
+      };
+    }
+
+    revalidateTag('inventory-instance-relations');
+    return { success: true, result: undefined };
+  } catch (error) {
+    console.error('Error update instance relation:', error);
     return {
       success: false,
       errorMessage:

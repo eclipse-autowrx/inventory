@@ -154,3 +154,8 @@ export interface InventoryInstanceRelationFormData {
   description?: string;
   metadata?: string;
 }
+
+export type InventoryInstanceRelationUpdatePayload = {
+  description?: string;
+  metadata?: string;
+};
