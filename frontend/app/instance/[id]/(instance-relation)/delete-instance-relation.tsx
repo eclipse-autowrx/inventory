@@ -50,7 +50,7 @@ export default function DeleteInstanceRelation({
     >
       <div className="w-[500px] flex flex-col gap-2 max-w-[90vw]">
         <DaText variant="sub-title" className="text-da-primary-500">
-          Delete Instance Relation &quot;{instanceRelation.source.name}
+          Delete Instance Relationship &quot;{instanceRelation.source.name}
           &quot;-&quot;{instanceRelation.target.name}&quot;
         </DaText>
 

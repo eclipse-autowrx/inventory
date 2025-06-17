@@ -4,13 +4,11 @@ import {
   getInventoryRelations,
 } from '@/services/inventory.service';
 import { InventoryRelation } from '@/types/inventory.type';
-import InstanceRelationForm from './instance-relation-form';
 import Link from 'next/link';
-import DaTooltip from '@/components/atoms/DaTooltip';
 import { DaButton } from '@/components/atoms/DaButton';
-import { TbEdit } from 'react-icons/tb';
-import DeleteInstanceRelation from './delete-instance-relation';
 import { getServerSession } from '@/lib/auth/server-session-auth';
+import CreateInstanceRelation from './create-instance-relation';
+import InstanceRelationItem from './instance-relation-item';
 
 interface InstanceRelationListProps {
   instanceId: string;
@@ -37,6 +35,24 @@ export default async function InstanceRelationList({
   const outgoingRelations = relations.results.filter(
     (relation) => relation.source.id === schemaId
   );
+
+  if (outgoingRelations.length === 0)
+    return (
+      <div className="mt-3">
+        <DaText variant="small">
+          There are no outgoing relations for this instance.
+        </DaText>
+        <Link href={`/schema/${schemaId}`}>
+          <DaButton
+            className="flex ml-4 gap-2 items-center"
+            variant="outline-nocolor"
+            size="sm"
+          >
+            Setup Relations
+          </DaButton>
+        </Link>
+      </div>
+    );
 
   return (
     <div>
@@ -86,9 +102,8 @@ async function RelationItem({
           {relation.name} {relation.target.name}
         </DaText>
       </div>
-      <InstanceRelationForm
-        currentInstanceId={instanceId}
-        className="-mt-6"
+      <CreateInstanceRelation
+        instanceId={instanceId}
         excludedInstanceIds={excludedInstanceIds}
         relation={relation}
       />
@@ -109,61 +124,21 @@ async function RelationItem({
             <div className="text-da-gray-darkest font-semibold flex-1">
               Metadata
             </div>
-            <div className="text-da-gray-darkest font-semibold min-w-14">
+            <div className="text-da-gray-darkest font-semibold w-16 text-center">
               Actions
             </div>
           </div>
-          <ul>
+          <div>
             {instanceRelations.results.map((instanceRelation) => (
-              <li
-                className="flex h-12 gap-x-4 border-t border-dashed items-center"
+              <InstanceRelationItem
+                instanceId={instanceId}
+                relation={relation}
                 key={instanceRelation.id}
-              >
-                <div className="flex-1">
-                  <DaTooltip content={instanceRelation.target.name}>
-                    <Link
-                      className="text-da-gray-darkest h-12 line-clamp-1 flex items-center hover:underline hover:text-da-primary-500"
-                      href={`/instance/${instanceRelation.target.id}`}
-                    >
-                      {instanceRelation.target.name}
-                    </Link>
-                  </DaTooltip>
-                </div>
-                <div className="flex-1">
-                  {instanceRelation.description && (
-                    <DaTooltip content={instanceRelation.description}>
-                      <div className="line-clamp-1 flex items-center h-10">
-                        {instanceRelation.description}
-                      </div>
-                    </DaTooltip>
-                  )}
-                </div>
-                <div className="flex-1">
-                  {instanceRelation.metadata && (
-                    <DaTooltip content={instanceRelation.metadata}>
-                      <div className="line-clamp-1 flex items-center h-10">
-                        {instanceRelation.metadata}
-                      </div>
-                    </DaTooltip>
-                  )}
-                </div>
-                <div className="min-w-14">
-                  {currentUserSession?.id &&
-                    currentUserSession.id ===
-                      instanceRelation.created_by?.id && (
-                      <>
-                        <DaButton size="sm" variant="plain">
-                          <TbEdit size={16} />
-                        </DaButton>
-                        <DeleteInstanceRelation
-                          instanceRelation={instanceRelation}
-                        />
-                      </>
-                    )}
-                </div>
-              </li>
+                instanceRelation={instanceRelation}
+                currentUserSession={currentUserSession}
+              />
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>
