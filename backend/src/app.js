@@ -38,12 +38,17 @@ app.use(mongoSanitize());
 app.use(compression());
 
 // enable cors
-app.use(
-  cors({
-    origin: config.cors.regex,
-    credentials: true,
-  })
-);
+if (config.env === 'development') {
+  app.use(cors('*'));
+} else {
+  app.use(
+    cors({
+      origin: config.cors.regex,
+      credentials: true,
+    }),
+  );
+}
+
 app.options('*', cors());
 
 app.use('/v2', convertUserHeader, routes);

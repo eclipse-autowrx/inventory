@@ -48,7 +48,7 @@ const createSchema = async (schemaBody, userId) => {
  * @param {Object} [advanced] - Advanced options: eg. search
  * @returns {Promise<QueryResult>}
  */
-const querySchemas = async (filter, options, advanced) => {
+const querySchemas = async (filter = {}, options = {}, advanced = {}) => {
   const finalFilter = buildMongoSearchFilter(filter, advanced.search, ['name', 'description']);
   const schemas = await Schema.paginate(finalFilter, options);
 
