@@ -40,8 +40,12 @@ defaultRoutes.forEach((route) => {
 });
 
 (async () => {
-  const middleware = await getGraphqlMiddleware();
-  router.use('/inventory/graphql', middleware);
+  try {
+    const middleware = await getGraphqlMiddleware();
+    router.use('/inventory/graphql', middleware);
+  } catch (error) {
+    console.error('Failed to initialize GraphQL middleware:', error);
+  }
 })();
 
 if (config.env === 'development') {
