@@ -23,7 +23,7 @@ const getInstance = catchAsync(async (req, res) => {
 });
 
 const updateInstance = catchAsync(async (req, res) => {
-  if (!(await instanceService.isOwner(req.params.instanceId, req.user.id))) {
+  if (!(await instanceService.isWriter(req.params.instanceId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to update this instance');
   }
   const instance = await instanceService.updateInstanceById(req.params.instanceId, req.body);
@@ -31,7 +31,7 @@ const updateInstance = catchAsync(async (req, res) => {
 });
 
 const deleteInstance = catchAsync(async (req, res) => {
-  if (!(await instanceService.isOwner(req.params.instanceId, req.user.id))) {
+  if (!(await instanceService.isWriter(req.params.instanceId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to delete this instance');
   }
   await instanceService.deleteInstanceById(req.params.instanceId);

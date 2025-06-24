@@ -17,16 +17,20 @@ function newAuthorizationClient(authorizeUrl, logger) {
 
   const client = {
     /**
-     *
+     * Authorize a user with a permission query, call as normal function
      * @param {string} query
      * @returns {Promise<boolean>}
      */
-    async authorize(query) {
+    async authorize(query, userId) {
       try {
-        await baseAxios.post('', {
-          permissionQuery: query,
+        const response = await baseAxios.post('', {
+          permissions: query,
+          userId,
         });
-        return true;
+        if (response.data && response.data[0] === true) {
+          return true;
+        }
+        return false;
       } catch (error) {
         logger?.error(`Authorization error ${error.message}`);
         return false;
@@ -34,7 +38,7 @@ function newAuthorizationClient(authorizeUrl, logger) {
     },
 
     /**
-     *
+     * Use to extract User ID from request header
      * @param {import('express').Request} req
      * @returns
      */
@@ -44,7 +48,7 @@ function newAuthorizationClient(authorizeUrl, logger) {
     },
 
     /**
-     *
+     * Extract Object ID from request path parameters
      * @param {import('express').Request} req
      */
     extractObjectIdFromPath(req) {
@@ -52,55 +56,64 @@ function newAuthorizationClient(authorizeUrl, logger) {
     },
 
     /**
-     *
-     * @param {string} query
-     * @returns {Function}
-     */
-    checkPermissionByQuery(query) {
-      return async (_, __, next) => {
-        const allowed = await this.authorize(query);
-        if (allowed) {
-          next();
-        } else {
-          next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
-        }
-      };
-    },
-
-    /**
-     *
-     * @param {string} act
-     * @param {string | undefined} type
+     * Check if user is admin
+     * @param {string} userId
      * @returns
      */
-    checkPermission(act, type) {
-      return async (req, res, next) => {
-        const userId = this.extractUserIdFromHeader(req);
-        if (!userId) {
-          return next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
-        }
-        const sub = `user:${userId}`;
-
-        let query = `${sub}#${act}`;
-
-        if (type) {
-          const objectId = this.extractObjectIdFromPath(req);
-          if (!objectId) {
-            return next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden. Cannot extract objectId.'));
-          }
-          query += `#${type}:${objectId}`;
-        }
-
-        return this.checkPermissionByQuery(query)(req, res, next);
-      };
+    isAdmin(userId) {
+      return this.authorize('managerUsers', userId);
     },
+
+    // /**
+    //  * This is a middleware function to check permission by query.
+    //  * @param {string} query
+    //  * @returns {Function}
+    //  */
+    // checkPermissionByQuery(query) {
+    //   return async (_, __, next) => {
+    //     const allowed = await this.authorize(query);
+    //     if (allowed) {
+    //       next();
+    //     } else {
+    //       next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
+    //     }
+    //   };
+    // },
+
+    // /**
+    //  * This is a middleware function to check permission based on action and type.
+    //  * @param {string} act
+    //  * @param {string | undefined} type
+    //  * @returns
+    //  */
+    // checkPermission(act, type) {
+    //   return async (req, res, next) => {
+    //     const userId = this.extractUserIdFromHeader(req);
+    //     if (!userId) {
+    //       return next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
+    //     }
+    //     const sub = `user:${userId}`;
+
+    //     let query = `${sub}#${act}`;
+
+    //     if (type) {
+    //       const objectId = this.extractObjectIdFromPath(req);
+    //       if (!objectId) {
+    //         return next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden. Cannot extract objectId.'));
+    //       }
+    //       query += `#${type}:${objectId}`;
+    //     }
+
+    //     return this.checkPermissionByQuery(query)(req, res, next);
+    //   };
+    // },
   };
 
   client.authorize = client.authorize.bind(client);
   client.extractUserIdFromHeader = client.extractUserIdFromHeader.bind(client);
   client.extractObjectIdFromPath = client.extractObjectIdFromPath.bind(client);
   client.checkPermissionByQuery = client.checkPermissionByQuery.bind(client);
-  client.checkPermission = client.checkPermission.bind(client);
+  // client.checkPermission = client.checkPermission.bind(client);
 
   return client;
 }

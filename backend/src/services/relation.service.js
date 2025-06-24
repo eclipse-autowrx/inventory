@@ -4,6 +4,7 @@ const ApiError = require('../utils/ApiError');
 const ParsedJsonPropertiesMongooseDecorator = require('../decorators/ParsedJsonPropertiesMongooseDecorator');
 const { buildMongoSearchFilter } = require('../utils/queryUtils');
 const InterservicePopulateListDecorator = require('../decorators/InterservicePopulateDecorator');
+const { authorizationClient } = require('../config/authorizationClient');
 
 /**
  * Check if source and target schemas exist
@@ -115,9 +116,10 @@ const getRelationById = async (id) => {
  * @param {string} relationId
  * @param {string} userId
  */
-const isOwner = async (relationId, userId) => {
+const isWriter = async (relationId, userId) => {
   const relation = await getRelationById(relationId);
-  return String(relation.created_by?.id) === String(userId);
+  const isAdmin = await authorizationClient.isAdmin(userId);
+  return String(relation.created_by?.id) === String(userId) || isAdmin;
 };
 
 /**
@@ -166,4 +168,4 @@ module.exports.queryRelations = queryRelations;
 module.exports.getRelationById = getRelationById;
 module.exports.updateRelationById = updateRelationById;
 module.exports.deleteRelationById = deleteRelationById;
-module.exports.isOwner = isOwner;
+module.exports.isWriter = isWriter;

@@ -3,6 +3,7 @@ const { InstanceRelation, Relation, Instance } = require('../models');
 const ApiError = require('../utils/ApiError');
 const ParsedJsonPropertiesMongooseDecorator = require('../decorators/ParsedJsonPropertiesMongooseDecorator');
 const InterservicePopulateListDecorator = require('../decorators/InterservicePopulateDecorator');
+const { authorizationClient } = require('../config/authorizationClient');
 
 /**
  * Validate the compatibility of source/target instances with the relation definition
@@ -145,9 +146,10 @@ const getInstanceRelationById = async (id) => {
  * @param {string} userId
  * @returns
  */
-const isOwner = async (instanceRelationId, userId) => {
+const isWriter = async (instanceRelationId, userId) => {
   const instanceRelation = await getInstanceRelationById(instanceRelationId);
-  return String(instanceRelation.created_by?.id) === String(userId);
+  const isAdmin = await authorizationClient.isAdmin(userId);
+  return String(instanceRelation.created_by?.id) === String(userId) || isAdmin;
 };
 
 /**
@@ -180,4 +182,4 @@ module.exports.queryInstanceRelations = queryInstanceRelations;
 module.exports.getInstanceRelationById = getInstanceRelationById;
 module.exports.updateInstanceRelationById = updateInstanceRelationById;
 module.exports.deleteInstanceRelationById = deleteInstanceRelationById;
-module.exports.isOwner = isOwner;
+module.exports.isWriter = isWriter;

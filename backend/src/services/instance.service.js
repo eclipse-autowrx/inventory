@@ -8,6 +8,7 @@ const ParsedJsonPropertiesMongooseDecorator = require('../decorators/ParsedJsonP
 const ParsedJsonPropertiesMongooseListDecorator = require('../decorators/ParsedJsonPropertiesMongooseListDecorator');
 const { buildMongoSearchFilter } = require('../utils/queryUtils');
 const InterservicePopulateListDecorator = require('../decorators/InterservicePopulateDecorator');
+const { authorizationClient } = require('../config/authorizationClient');
 
 /**
  * Validate instance data against its schema definition
@@ -124,9 +125,10 @@ const getInstanceById = async (id) => {
     .getSinglePopulatedDoc();
 };
 
-const isOwner = async (instanceId, userId) => {
+const isWriter = async (instanceId, userId) => {
   const instance = await getInstanceById(instanceId);
-  return String(instance.created_by?.id) === String(userId);
+  const isAdmin = await authorizationClient.isAdmin(userId);
+  return String(instance.created_by?.id) === String(userId) || isAdmin;
 };
 
 /**
@@ -164,4 +166,4 @@ module.exports.queryInstances = queryInstances;
 module.exports.getInstanceById = getInstanceById;
 module.exports.updateInstanceById = updateInstanceById;
 module.exports.deleteInstanceById = deleteInstanceById;
-module.exports.isOwner = isOwner;
+module.exports.isWriter = isWriter;

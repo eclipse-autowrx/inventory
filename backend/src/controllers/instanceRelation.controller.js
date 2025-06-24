@@ -22,7 +22,7 @@ const getInstanceRelation = catchAsync(async (req, res) => {
 });
 
 const updateInstanceRelation = catchAsync(async (req, res) => {
-  if (!(await instanceRelationService.isOwner(req.params.instanceRelationId, req.user.id))) {
+  if (!(await instanceRelationService.isWriter(req.params.instanceRelationId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to update this instance relation');
   }
   const instanceRelation = await instanceRelationService.updateInstanceRelationById(req.params.instanceRelationId, req.body);
@@ -30,7 +30,7 @@ const updateInstanceRelation = catchAsync(async (req, res) => {
 });
 
 const deleteInstanceRelation = catchAsync(async (req, res) => {
-  if (!(await instanceRelationService.isOwner(req.params.instanceRelationId, req.user.id))) {
+  if (!(await instanceRelationService.isWriter(req.params.instanceRelationId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to delete this instance relation');
   }
   await instanceRelationService.deleteInstanceRelationById(req.params.instanceRelationId);

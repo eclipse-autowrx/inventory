@@ -6,6 +6,7 @@ const ParsedJsonPropertiesMongooseDecorator = require('../decorators/ParsedJsonP
 const ParsedJsonPropertiesMongooseListDecorator = require('../decorators/ParsedJsonPropertiesMongooseListDecorator');
 const { buildMongoSearchFilter } = require('../utils/queryUtils');
 const InterservicePopulateDecorator = require('../decorators/InterservicePopulateDecorator');
+const { authorizationClient } = require('../config/authorizationClient');
 
 /**
  *
@@ -83,9 +84,10 @@ const getSchemaById = async (id) => {
  * @param {string} schemaId
  * @param {string} userId
  */
-const isOwner = async (schemaId, userId) => {
+const isWriter = async (schemaId, userId) => {
   const schema = await getSchemaById(schemaId);
-  return String(schema.created_by?.id) === String(userId);
+  const isAdmin = await authorizationClient.isAdmin(userId);
+  return String(schema.created_by?.id) === String(userId) || isAdmin;
 };
 
 /**
@@ -118,6 +120,6 @@ const deleteSchemaById = async (schemaId) => {
 module.exports.createSchema = createSchema;
 module.exports.querySchemas = querySchemas;
 module.exports.getSchemaById = getSchemaById;
-module.exports.isOwner = isOwner;
+module.exports.isWriter = isWriter;
 module.exports.updateSchemaById = updateSchemaById;
 module.exports.deleteSchemaById = deleteSchemaById;

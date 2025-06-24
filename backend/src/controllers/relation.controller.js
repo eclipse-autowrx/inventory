@@ -33,7 +33,7 @@ const getRelation = catchAsync(async (req, res) => {
 });
 
 const updateRelation = catchAsync(async (req, res) => {
-  if (!(await relationService.isOwner(req.params.relationId, req.user.id))) {
+  if (!(await relationService.isWriter(req.params.relationId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to update this relation');
   }
   const relation = await relationService.updateRelationById(req.params.relationId, req.body);
@@ -41,7 +41,7 @@ const updateRelation = catchAsync(async (req, res) => {
 });
 
 const deleteRelation = catchAsync(async (req, res) => {
-  if (!(await relationService.isOwner(req.params.relationId, req.user.id))) {
+  if (!(await relationService.isWriter(req.params.relationId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to delete this relation');
   }
   await relationService.deleteRelationById(req.params.relationId);
