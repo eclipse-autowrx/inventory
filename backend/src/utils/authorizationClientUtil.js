@@ -112,7 +112,7 @@ function newAuthorizationClient(authorizeUrl, logger) {
   client.authorize = client.authorize.bind(client);
   client.extractUserIdFromHeader = client.extractUserIdFromHeader.bind(client);
   client.extractObjectIdFromPath = client.extractObjectIdFromPath.bind(client);
-  client.checkPermissionByQuery = client.checkPermissionByQuery.bind(client);
+  // client.checkPermissionByQuery = client.checkPermissionByQuery.bind(client);
   // client.checkPermission = client.checkPermission.bind(client);
 
   return client;
