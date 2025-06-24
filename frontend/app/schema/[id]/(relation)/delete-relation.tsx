@@ -7,6 +7,7 @@ import { deleteInventoryRelation } from '@/services/inventory.service';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { TbLoader, TbTrash } from 'react-icons/tb';
+import { toast } from 'react-toastify';
 
 interface DeleteRelationProps {
   relationId: string;
@@ -30,6 +31,7 @@ export default function DeleteRelation({
       open[1](false);
     },
     onError(error) {
+      toast.error('Failed to delete relation: ' + (error as Error).message);
       console.error('Failed to delete relation:', error);
     },
   });
