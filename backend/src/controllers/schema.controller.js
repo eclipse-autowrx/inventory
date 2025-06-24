@@ -23,7 +23,7 @@ const getSchema = catchAsync(async (req, res) => {
 });
 
 const updateSchema = catchAsync(async (req, res) => {
-  if (!(await schemaService.isOwner(req.params.schemaId, req.user.id))) {
+  if (!(await schemaService.isWriter(req.params.schemaId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to update this schema');
   }
   const schema = await schemaService.updateSchemaById(req.params.schemaId, req.body);
@@ -31,7 +31,7 @@ const updateSchema = catchAsync(async (req, res) => {
 });
 
 const deleteSchema = catchAsync(async (req, res) => {
-  if (!(await schemaService.isOwner(req.params.schemaId, req.user.id))) {
+  if (!(await schemaService.isWriter(req.params.schemaId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to delete this schema');
   }
   await schemaService.deleteSchemaById(req.params.schemaId);
