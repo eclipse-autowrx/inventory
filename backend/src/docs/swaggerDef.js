@@ -13,12 +13,16 @@ const swaggerDef = {
   },
   servers: [
     {
-      url: `http://localhost:${config.port}/v2`,
-      description: 'Development server',
-    },
-    {
       url: `https://backend-core-dev.digital.auto/v2`,
       description: 'Production server',
+    },
+    {
+      url: `http://localhost:${config.port}/v2`,
+      description: 'Local server',
+    },
+    {
+      url: `https://dev.backend-core-dev.digital.auto/v2`,
+      description: 'Development server',
     },
   ],
 };

@@ -1,8 +1,14 @@
+const j2s = require('joi-to-swagger');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerDef = require('./swaggerDef');
-
 const swaggerDocs = swaggerJsDoc(swaggerDef);
-const j2s = require('joi-to-swagger');
+
+// Set global security using bearerAuth for all endpoints
+swaggerDocs.security = [
+  {
+    bearerAuth: [],
+  },
+];
 
 const injectJoiToSwagger = (path, method, schema) => {
   if (!swaggerDocs.paths[path]) {
