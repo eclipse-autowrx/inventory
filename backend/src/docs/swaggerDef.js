@@ -13,11 +13,19 @@ const swaggerDef = {
   },
   servers: [
     {
-      url: `http://localhost:${config.port}/v1`,
+      url: `http://localhost:${config.port}/v2`,
+      description: 'Development server',
+    },
+    {
+      url: `https://backend-core-dev.digital.auto/v2`,
+      description: 'Production server',
     },
   ],
 };
 
+/**
+ * @type {import('swagger-jsdoc').Options}
+ */
 const options = {
   swaggerDefinition: swaggerDef,
   apis: ['src/routes/**/*.js', 'src/docs/*.yml'],

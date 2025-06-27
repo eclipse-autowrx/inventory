@@ -159,7 +159,7 @@ components:
         - schema_definition
         - created_by
       properties:
-        _id:
+        id:
           type: string
           format: objectId
           description: Unique identifier for the schema
@@ -170,7 +170,7 @@ components:
           type: string
           description: Optional description of the schema
         schema_definition:
-          type: string
+          type: object
           description: Definition of the schema
         created_by:
           type: string
