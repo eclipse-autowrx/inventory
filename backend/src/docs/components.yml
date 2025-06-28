@@ -16,7 +16,7 @@ components:
         - data
         - created_by
       properties:
-        _id:
+        id:
           type: string
           description: Unique identifier for the instance
           format: objectId
@@ -28,7 +28,7 @@ components:
           format: objectId
           description: Reference to the Schema this instance conforms to
         data:
-          type: string
+          type: object
           description: The actual data/object payload
         created_by:
           type: string
@@ -51,7 +51,7 @@ components:
         - target
         - created_by
       properties:
-        _id:
+        id:
           type: string
           format: objectId
           description: Unique identifier for the instance relation
@@ -95,7 +95,7 @@ components:
         - target
         - created_by
       properties:
-        _id:
+        id:
           type: string
           format: objectId
           description: Unique identifier for the relation
@@ -104,8 +104,8 @@ components:
           description: Name of the relation
         type:
           type: string
-          enum: ['composition', 'association', 'inheritance', 'custom']
-          default: 'custom'
+          enum: ['composition', 'association', 'inheritance']
+          default: 'association'
           description: Type of the relation
         description:
           type: string

@@ -6,19 +6,6 @@ const { injectJoiToSwagger } = require('../../docs/swagger');
 
 const router = express.Router();
 
-router
-  .route('/')
-  .post(validate(schemaValidation.createSchema), schemaController.createSchema)
-  .get(validate(schemaValidation.getSchemas), schemaController.getSchemas);
-
-router
-  .route('/:schemaId')
-  .get(validate(schemaValidation.getSchema), schemaController.getSchema)
-  .patch(validate(schemaValidation.updateSchema), schemaController.updateSchema)
-  .delete(validate(schemaValidation.deleteSchema), schemaController.deleteSchema);
-
-module.exports = router;
-
 /**
  * @swagger
  * tags:
@@ -144,3 +131,16 @@ injectJoiToSwagger('/inventory/schemas/{schemaId}', 'patch', schemaValidation.up
  *         $ref: '#/components/responses/NotFound'
  */
 injectJoiToSwagger('/inventory/schemas/{schemaId}', 'delete', schemaValidation.deleteSchema);
+
+router
+  .route('/')
+  .post(validate(schemaValidation.createSchema), schemaController.createSchema)
+  .get(validate(schemaValidation.getSchemas), schemaController.getSchemas);
+
+router
+  .route('/:schemaId')
+  .get(validate(schemaValidation.getSchema), schemaController.getSchema)
+  .patch(validate(schemaValidation.updateSchema), schemaController.updateSchema)
+  .delete(validate(schemaValidation.deleteSchema), schemaController.deleteSchema);
+
+module.exports = router;
