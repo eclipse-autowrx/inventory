@@ -23,7 +23,19 @@ if (config.env !== 'test') {
 app.use(cookies());
 
 // set security HTTP headers
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        connectSrc: ["'self'", 'https://backend-core-dev.digital.auto', 'https://dev.backend-core-dev.digital.auto'],
+        imgSrc: ["'self'", 'data:'],
+      },
+    },
+  }),
+);
 
 // parse json request body
 app.use(express.json({ limit: '50mb', strict: false }));
