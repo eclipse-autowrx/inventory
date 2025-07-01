@@ -1,0 +1,43 @@
+# Inventory License Header Ignore File
+# This file lists patterns for files that should be excluded from automatic license header insertion
+
+# Node.js dependencies
+node_modules/
+node_modules/**
+
+# Package manager files
+package-lock.json
+yarn.lock
+
+# Configuration files without comment support
+*.json
+*.yml
+*.yaml
+*.toml
+
+# Documentation files
+README*
+*.md
+LICENSE*
+
+# Build artifacts and outputs
+build/
+dist/
+.next/
+coverage/
+
+# Environment and config files
+.env*
+*.conf
+
+# Image and binary files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+
+# Generated or third-party files
+public/
+static/
