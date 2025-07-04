@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -72,21 +72,21 @@ function newAuthorizationClient(authorizeUrl, logger) {
       return this.authorize('managerUsers', userId);
     },
 
-    // /**
-    //  * This is a middleware function to check permission by query.
-    //  * @param {string} query
-    //  * @returns {Function}
-    //  */
-    // checkPermissionByQuery(query) {
-    //   return async (_, __, next) => {
-    //     const allowed = await this.authorize(query);
-    //     if (allowed) {
-    //       next();
-    //     } else {
-    //       next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
-    //     }
-    //   };
-    // },
+    /**
+     * This is a middleware function to check permission by query.
+     * @param {string} query
+     * @returns {Function}
+     */
+    checkPermissionByQuery(query) {
+      return async (_, __, next) => {
+        const allowed = await this.authorize(query);
+        if (allowed) {
+          next();
+        } else {
+          next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
+        }
+      };
+    },
 
     // /**
     //  * This is a middleware function to check permission based on action and type.
