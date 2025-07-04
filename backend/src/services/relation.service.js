@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -134,9 +134,10 @@ const isWriter = async (relationId, userId) => {
  * Update relation by id
  * @param {ObjectId} relationId
  * @param {Object} updateBody
+ * @param {string} actionOwner
  * @returns {Promise<Relation>}
  */
-const updateRelationById = async (relationId, updateBody) => {
+const updateRelationById = async (relationId, updateBody, actionOwner) => {
   const relation = await getRelationById(relationId);
 
   // Prevent changing source/target easily, or re-validate if allowed
@@ -147,6 +148,7 @@ const updateRelationById = async (relationId, updateBody) => {
     );
   }
 
+  updateBody.action_owner = actionOwner;
   Object.assign(relation, updateBody);
 
   if (updateBody.source_cardinality === null) {
@@ -163,10 +165,12 @@ const updateRelationById = async (relationId, updateBody) => {
 /**
  * Delete relation by id
  * @param {ObjectId} relationId
+ * @param {string} actionOwner
  * @returns {Promise<Relation>}
  */
-const deleteRelationById = async (relationId) => {
+const deleteRelationById = async (relationId, actionOwner) => {
   const relation = await getRelationById(relationId);
+  relation.action_owner = actionOwner;
   await relation.remove();
   return relation;
 };

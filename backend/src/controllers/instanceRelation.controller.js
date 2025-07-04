@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -33,7 +33,11 @@ const updateInstanceRelation = catchAsync(async (req, res) => {
   if (!(await instanceRelationService.isWriter(req.params.instanceRelationId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to update this instance relation');
   }
-  const instanceRelation = await instanceRelationService.updateInstanceRelationById(req.params.instanceRelationId, req.body);
+  const instanceRelation = await instanceRelationService.updateInstanceRelationById(
+    req.params.instanceRelationId,
+    req.body,
+    req.user.id,
+  );
   res.send(instanceRelation);
 });
 
@@ -41,7 +45,7 @@ const deleteInstanceRelation = catchAsync(async (req, res) => {
   if (!(await instanceRelationService.isWriter(req.params.instanceRelationId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to delete this instance relation');
   }
-  await instanceRelationService.deleteInstanceRelationById(req.params.instanceRelationId);
+  await instanceRelationService.deleteInstanceRelationById(req.params.instanceRelationId, req.user.id);
   res.status(httpStatus.NO_CONTENT).send();
 });
 

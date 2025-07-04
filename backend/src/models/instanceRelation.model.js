@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -7,7 +7,7 @@
 // SPDX-License-Identifier: MIT
 
 const mongoose = require('mongoose');
-const { toJSON, paginate } = require('./plugins');
+const { toJSON, paginate, captureChange } = require('./plugins');
 
 const instanceRelationSchema = new mongoose.Schema(
   {
@@ -49,7 +49,7 @@ const instanceRelationSchema = new mongoose.Schema(
   },
   {
     timestamps: true, // createdAt indicates when the link was established
-  }
+  },
 );
 
 // Add index for common traversal patterns
@@ -60,6 +60,11 @@ instanceRelationSchema.index({ target: 1, relation: 1 });
 // Add plugins
 instanceRelationSchema.plugin(toJSON);
 instanceRelationSchema.plugin(paginate); // Paginate might be less common here
+
+// Add captureChange plugin
+instanceRelationSchema.pre('save', captureChange.captureUpdates);
+instanceRelationSchema.post('save', captureChange.captureCreate);
+instanceRelationSchema.post('remove', captureChange.captureRemove);
 
 /**
  * @typedef InstanceRelation

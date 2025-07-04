@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -8,7 +8,7 @@
 
 // models/relation.model.js
 const mongoose = require('mongoose');
-const { toJSON, paginate } = require('./plugins');
+const { toJSON, paginate, captureChange } = require('./plugins');
 const InstanceRelation = require('./instanceRelation.model');
 
 const relationSchema = new mongoose.Schema(
@@ -84,6 +84,11 @@ relationSchema.index({ source: 1, target: 1, type: 1 }, { unique: true });
 // Add plugins
 relationSchema.plugin(toJSON);
 relationSchema.plugin(paginate);
+
+// Add captureChange plugin
+relationSchema.pre('save', captureChange.captureUpdates);
+relationSchema.post('save', captureChange.captureCreate);
+relationSchema.post('remove', captureChange.captureRemove);
 
 relationSchema.post('remove', async function (_, next) {
   try {

@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -164,11 +164,13 @@ const isWriter = async (instanceRelationId, userId) => {
  * Update instance relation by id (typically only metadata)
  * @param {ObjectId} instanceRelationId
  * @param {Object} updateBody
+ * @param {string} actionOwner
  * @returns {Promise<InstanceRelation>}
  */
-const updateInstanceRelationById = async (instanceRelationId, updateBody) => {
+const updateInstanceRelationById = async (instanceRelationId, updateBody, actionOwner) => {
   const instanceRelation = await getInstanceRelationById(instanceRelationId);
 
+  updateBody.action_owner = actionOwner;
   Object.assign(instanceRelation, updateBody);
   await instanceRelation.save();
   return instanceRelation;
@@ -177,10 +179,12 @@ const updateInstanceRelationById = async (instanceRelationId, updateBody) => {
 /**
  * Delete instance relation by id
  * @param {ObjectId} instanceRelationId
+ * @param {string} actionOwner
  * @returns {Promise<InstanceRelation>}
  */
-const deleteInstanceRelationById = async (instanceRelationId) => {
+const deleteInstanceRelationById = async (instanceRelationId, actionOwner) => {
   const instanceRelation = await getInstanceRelationById(instanceRelationId);
+  instanceRelation.action_owner = actionOwner;
   await instanceRelation.remove();
   return instanceRelation;
 };

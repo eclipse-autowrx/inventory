@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -7,7 +7,7 @@
 // SPDX-License-Identifier: MIT
 
 const mongoose = require('mongoose');
-const { toJSON, paginate } = require('./plugins');
+const { toJSON, paginate, captureChange } = require('./plugins');
 const InstanceRelation = require('./instanceRelation.model');
 
 const instanceSchema = new mongoose.Schema(
@@ -38,12 +38,17 @@ const instanceSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Add plugins
 instanceSchema.plugin(toJSON);
 instanceSchema.plugin(paginate);
+
+// Add captureChange plugin
+instanceSchema.pre('save', captureChange.captureUpdates);
+instanceSchema.post('save', captureChange.captureCreate);
+instanceSchema.post('remove', captureChange.captureRemove);
 
 instanceSchema.post('remove', async function (_, next) {
   try {
