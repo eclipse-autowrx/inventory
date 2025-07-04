@@ -19,7 +19,6 @@ const router = express.Router();
  * tags:
  *   name: Instances
  *   description: API for managing instances
- *   x-order: 1
  */
 
 /**
