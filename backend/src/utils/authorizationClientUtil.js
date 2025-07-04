@@ -69,7 +69,7 @@ function newAuthorizationClient(authorizeUrl, logger) {
      * @returns
      */
     isAdmin(userId) {
-      return this.authorize('managerUsers', userId);
+      return this.authorize('manageUsers', userId);
     },
 
     /**
