@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -34,7 +34,7 @@ const updateInstance = catchAsync(async (req, res) => {
   if (!(await instanceService.isWriter(req.params.instanceId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to update this instance');
   }
-  const instance = await instanceService.updateInstanceById(req.params.instanceId, req.body);
+  const instance = await instanceService.updateInstanceById(req.params.instanceId, req.body, req.user.id);
   res.send(instance);
 });
 
@@ -42,7 +42,7 @@ const deleteInstance = catchAsync(async (req, res) => {
   if (!(await instanceService.isWriter(req.params.instanceId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to delete this instance');
   }
-  await instanceService.deleteInstanceById(req.params.instanceId);
+  await instanceService.deleteInstanceById(req.params.instanceId, req.user.id);
   res.status(httpStatus.NO_CONTENT).send();
 });
 

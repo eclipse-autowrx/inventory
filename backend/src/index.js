@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -10,11 +10,14 @@ const mongoose = require('mongoose');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
+const { convertLogsCap } = require('./scripts');
 
 let server;
 mongoose.set('strictQuery', true);
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   logger.info('Connected to MongoDB ');
+
+  convertLogsCap();
 
   server = app.listen(config.port, () => {
     logger.info(`Listening to port ${config.port}`);

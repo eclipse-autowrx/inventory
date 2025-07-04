@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -143,9 +143,10 @@ const isWriter = async (instanceId, userId) => {
  * Update instance by id
  * @param {ObjectId} instanceId
  * @param {Object} updateBody
+ * @param {string} actionOwner
  * @returns {Promise<Instance>}
  */
-const updateInstanceById = async (instanceId, updateBody) => {
+const updateInstanceById = async (instanceId, updateBody, actionOwner) => {
   const instance = await getInstanceById(instanceId);
 
   // Re-validate data if it's being updated
@@ -153,6 +154,7 @@ const updateInstanceById = async (instanceId, updateBody) => {
     await validateDataAgainstSchema(instance.schema._id, updateBody.data);
   }
 
+  updateBody.action_owner = actionOwner;
   Object.assign(instance, updateBody);
   await instance.save();
   return instance;
@@ -161,10 +163,12 @@ const updateInstanceById = async (instanceId, updateBody) => {
 /**
  * Delete instance by id
  * @param {ObjectId} instanceId
+ * @param {string} actionOwner
  * @returns {Promise<Instance>}
  */
-const deleteInstanceById = async (instanceId) => {
+const deleteInstanceById = async (instanceId, actionOwner) => {
   const instance = await getInstanceById(instanceId);
+  instance.action_owner = actionOwner;
   await instance.remove();
   return instance;
 };

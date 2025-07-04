@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -34,7 +34,7 @@ const updateSchema = catchAsync(async (req, res) => {
   if (!(await schemaService.isWriter(req.params.schemaId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to update this schema');
   }
-  const schema = await schemaService.updateSchemaById(req.params.schemaId, req.body);
+  const schema = await schemaService.updateSchemaById(req.params.schemaId, req.body, req.user.id);
   res.send(schema);
 });
 
@@ -42,7 +42,7 @@ const deleteSchema = catchAsync(async (req, res) => {
   if (!(await schemaService.isWriter(req.params.schemaId, req.user.id))) {
     throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to delete this schema');
   }
-  await schemaService.deleteSchemaById(req.params.schemaId);
+  await schemaService.deleteSchemaById(req.params.schemaId, req.user.id);
   res.status(httpStatus.NO_CONTENT).send();
 });
 

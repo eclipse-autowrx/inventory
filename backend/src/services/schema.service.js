@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -102,13 +102,15 @@ const isWriter = async (schemaId, userId) => {
  * Update schema by id
  * @param {ObjectId} schemaId
  * @param {Object} updateBody
+ * @param {string} actionOwner
  * @returns {Promise<Schema>}
  */
-const updateSchemaById = async (schemaId, updateBody) => {
+const updateSchemaById = async (schemaId, updateBody, actionOwner) => {
   const schema = await getSchemaById(schemaId); // Reuse getById to check existence
   if (updateBody.schema_definition) {
     await validateSchemaDefinition(updateBody.schema_definition);
   }
+  updateBody.action_owner = actionOwner;
   Object.assign(schema, updateBody);
   await schema.save();
   return schema;
@@ -117,10 +119,12 @@ const updateSchemaById = async (schemaId, updateBody) => {
 /**
  * Delete schema by id
  * @param {ObjectId} schemaId
+ * @param {string} actionOwner
  * @returns {Promise<Schema>}
  */
-const deleteSchemaById = async (schemaId) => {
+const deleteSchemaById = async (schemaId, actionOwner) => {
   const schema = await getSchemaById(schemaId);
+  schema.action_owner = actionOwner;
   await schema.remove();
   return schema;
 };
