@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -11,6 +11,7 @@ const schemaRoute = require('./schema.route');
 const relationRoute = require('./relation.route');
 const instanceRoute = require('./instance.route');
 const instanceRelationRoute = require('./instanceRelation.route');
+const changeLogsRoute = require('./changeLogs.route');
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 const { getGraphqlMiddleware } = require('../../graphql/setup');
@@ -33,6 +34,10 @@ const defaultRoutes = [
   {
     path: '/inventory/instance-relations',
     route: instanceRelationRoute,
+  },
+  {
+    path: '/inventory/change-logs',
+    route: changeLogsRoute,
   },
 ];
 

@@ -1,5 +1,5 @@
 # Copyright (c) 2025 Eclipse Foundation.
-# 
+#
 # This program and the accompanying materials are made available under the
 # terms of the MIT License which is available at
 # https://opensource.org/licenses/MIT.
@@ -193,6 +193,47 @@ components:
           format: date-time
           description: Timestamp when the schema was last updated
 
+    ChangeLog:
+      type: object
+      required:
+        - created_by
+        - ref_type
+        - ref
+        - action
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the change log entry
+          format: objectId
+        created_by:
+          type: string
+          format: objectId
+          description: Reference to the User who created the change log entry
+        description:
+          type: string
+          description: Optional description of the change
+        ref_type:
+          type: string
+          description: Type of the referenced entity (e.g., 'Instance', 'Schema', etc.)
+        ref:
+          type: string
+          format: objectId
+          description: Reference to the entity that was changed
+        action:
+          type: string
+          enum: ['CREATE', 'UPDATE', 'DELETE']
+          description: Type of action performed on the referenced entity
+        changes:
+          type: object
+          description: Object containing the details of what changed (flexible structure)
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the change log entry was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the change log entry was last updated
   responses:
     BadRequest:
       description: Bad request

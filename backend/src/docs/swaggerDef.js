@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -40,7 +40,14 @@ const swaggerDef = {
  */
 const options = {
   swaggerDefinition: swaggerDef,
-  apis: ['src/routes/**/*.js', 'src/docs/*.yml'],
+  apis: [
+    'src/routes/v2/schema.route.js',
+    'src/routes/v2/instance.route.js',
+    'src/routes/v2/relation.route.js',
+    'src/routes/v2/instanceRelation.route.js',
+    'src/routes/v2/changeLogs.route.js',
+    'src/docs/*.yml',
+  ],
 };
 
 module.exports = options;
