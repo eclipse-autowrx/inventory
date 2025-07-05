@@ -5,19 +5,22 @@
 // https://opensource.org/licenses/MIT.
 //
 // SPDX-License-Identifier: MIT
+const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
-import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { beforeEach } from 'vitest';
-
-/**
- * @type {MongoMemoryServer}
- */
+// Remove vitest imports
 let mongoServer;
 
+jest.mock('../src/models/plugins/captureChange.plugin.js', () => ({
+  captureCreate: jest.fn(),
+  captureUpdates: jest.fn(),
+  captureRemove: jest.fn(),
+}));
+
+// Use Jest lifecycle hooks
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  mongoose.connect(mongoServer.getUri());
+  await mongoose.connect(mongoServer.getUri());
 });
 
 afterAll(async () => {
