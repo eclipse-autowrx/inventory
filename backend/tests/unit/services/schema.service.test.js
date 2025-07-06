@@ -6,88 +6,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-const { default: axios } = require('axios');
 const { schemaService } = require('../../../src/services');
 const mongoose = require('mongoose');
-const { userService } = require('../../../src/services/interservice');
-const { Schema } = require('../../../src/models');
 const SchemaModel = require('../../../src/models/schema.model');
+const {
+  testIds,
+  setupCommonMocks,
+  generateMockSchemaBody,
+  createTestSchema,
+  checkSchemaMatch,
+  checkSchemasMatch,
+} = require('../helpers/service-test.helper');
 
 describe('Schema Service', () => {
-  let userId = new mongoose.Types.ObjectId();
+  let userId;
+  let adminUserId;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    userId = testIds.userId;
+    adminUserId = testIds.adminUserId;
+    setupCommonMocks();
   });
-
-  // Mock interservice user data
-  jest.spyOn(userService, 'getUsers').mockImplementation(function (options) {
-    const ids = options.id.split(',');
-    const result = ids.map((id) => ({
-      id: id,
-      name: 'Test user name',
-      image_file: 'https://example.com/image.jpg',
-    }));
-    return Promise.resolve(result);
-  });
-
-  const generateMockSchemaBody = (overrides = {}) => ({
-    name: 'Test Schema',
-    description: 'Test Schema description',
-    schema_definition: JSON.stringify({
-      type: 'object',
-      properties: {
-        title: { type: 'string' },
-        description: { type: 'string' },
-        type: { type: 'string', enum: ['object', 'array'] },
-        properties: {
-          type: 'object',
-          additionalProperties: true,
-        },
-      },
-      required: ['title', 'type'],
-    }),
-    ...overrides,
-  });
-
-  const insertMockSchema = async (overrides = {}, userId = undefined) => {
-    const mockSchemaBody = generateMockSchemaBody(overrides);
-    const randomUserId = new mongoose.Types.ObjectId();
-    return await schemaService.createSchema(mockSchemaBody, randomUserId.toString());
-  };
-
-  const checkMatchFullResults = (result, createdSchemas, overrides = {}) => {
-    expect(result).toBeDefined();
-    expect(result.results.length).toBe(overrides?.resultsLength || 2);
-    expect(result.totalPages).toBe(overrides?.totalPages || 2);
-    expect(result.totalResults).toBe(overrides?.totalResults || createdSchemas.length);
-    expect(result.results).toEqual(
-      expect.arrayContaining(
-        createdSchemas.slice(0, 2).map((schema) =>
-          expect.objectContaining({
-            name: schema.name,
-            description: schema.description,
-            schema_definition: JSON.parse(schema.schema_definition),
-            created_by: expect.objectContaining({
-              id: schema.created_by.toString(),
-              name: 'Test user name',
-              image_file: 'https://example.com/image.jpg',
-            }),
-          }),
-        ),
-      ),
-    );
-  };
-
-  const checkMatchSingleResult = (result, createdSchema) => {
-    expect(result).toBeDefined();
-    expect(result.name).toBe(createdSchema.name);
-    expect(result.description).toBe(createdSchema.description);
-    expect(result.schema_definition).toEqual(JSON.parse(createdSchema.schema_definition));
-    expect(result.created_by.id).toBe(createdSchema.created_by.toString());
-    expect(result.created_by.name).toBe('Test user name');
-    expect(result.created_by.image_file).toBe('https://example.com/image.jpg');
-  };
 
   describe('createSchema', () => {
     const mockSchemaBody = generateMockSchemaBody();
@@ -139,14 +78,17 @@ describe('Schema Service', () => {
 
     beforeEach(async () => {
       createdSchemas = [];
-      createdSchemas.push(await insertMockSchema({ name: 'Schema 1', description: 'Description 1' }));
-      createdSchemas.push(await insertMockSchema({ name: 'Schema 2', description: 'Matching text 1' }));
-      createdSchemas.push(await insertMockSchema({ name: 'Matching text 2', description: 'Description 2' }));
+      createdSchemas.push(await createTestSchema({ name: 'Schema 1', description: 'Description 1' }));
+      createdSchemas.push(await createTestSchema({ name: 'Schema 2', description: 'Matching text 1' }));
+      createdSchemas.push(await createTestSchema({ name: 'Matching text 2', description: 'Description 2' }));
     });
 
     it('should return paginated schemas', async () => {
       const result = await schemaService.querySchemas({}, { limit: 2, page: 1 });
-      checkMatchFullResults(result, createdSchemas);
+      expect(result).toBeDefined();
+      expect(result.results.length).toBe(2);
+      expect(result.totalResults).toBe(3);
+      checkSchemasMatch(result, createdSchemas.slice(0, 2));
     });
 
     it('should return empty results when no schemas match the filter', async () => {
@@ -163,7 +105,7 @@ describe('Schema Service', () => {
       expect(result.results.length).toBe(1);
       expect(result.totalPages).toBe(1);
       expect(result.totalResults).toBe(1);
-      checkMatchSingleResult(result.results[0], createdSchemas[0]);
+      checkSchemaMatch(result.results[0], createdSchemas[0]);
     });
 
     it('should filter schemas by created_by', async () => {
@@ -177,7 +119,7 @@ describe('Schema Service', () => {
       expect(result.results.length).toBe(1);
       expect(result.totalPages).toBe(1);
       expect(result.totalResults).toBe(1);
-      checkMatchSingleResult(result.results[0], createdSchemas[0]);
+      checkSchemaMatch(result.results[0], createdSchemas[0]);
     });
 
     it('should return schemas with matching search term', async () => {
@@ -186,17 +128,17 @@ describe('Schema Service', () => {
       expect(result.results.length).toBe(2);
       expect(result.totalPages).toBe(1);
       expect(result.totalResults).toBe(2);
-      checkMatchSingleResult(result.results[0], createdSchemas[1]);
-      checkMatchSingleResult(result.results[1], createdSchemas[2]);
+      checkSchemaMatch(result.results[0], createdSchemas[1]);
+      checkSchemaMatch(result.results[1], createdSchemas[2]);
     });
   });
 
   describe('getSchemaById', () => {
     it('should return schema by id', async () => {
-      const createdSchema = await insertMockSchema();
+      const createdSchema = await createTestSchema();
       const result = await schemaService.getSchemaById(createdSchema._id.toString());
       expect(result).toBeDefined();
-      checkMatchSingleResult(result, createdSchema);
+      checkSchemaMatch(result, createdSchema);
     });
 
     it('should throw 404 error if schema not found', async () => {
@@ -213,7 +155,7 @@ describe('Schema Service', () => {
     let testSchema;
 
     beforeEach(async () => {
-      testSchema = await insertMockSchema(
+      testSchema = await createTestSchema(
         {
           name: 'Original Schema Name',
           description: 'Original description',
@@ -281,7 +223,7 @@ describe('Schema Service', () => {
     let testSchema;
 
     beforeEach(async () => {
-      testSchema = await insertMockSchema(
+      testSchema = await createTestSchema(
         {
           name: 'Schema To Delete',
           schema_definition: JSON.stringify({
@@ -295,13 +237,11 @@ describe('Schema Service', () => {
 
     it('should delete schema successfully', async () => {
       await schemaService.deleteSchemaById(testSchema.id, userId.toString());
-
       await expect(schemaService.getSchemaById(testSchema.id)).rejects.toThrow('Schema not found');
     });
 
     it('should set action_owner before deletion', async () => {
       const schemaSpy = jest.spyOn(SchemaModel.prototype, 'remove');
-
       await schemaService.deleteSchemaById(testSchema.id, userId.toString());
 
       expect(schemaSpy).toHaveBeenCalled();
@@ -312,6 +252,44 @@ describe('Schema Service', () => {
     it('should throw error for non-existent schema', async () => {
       const nonExistentId = new mongoose.Types.ObjectId();
       await expect(schemaService.deleteSchemaById(nonExistentId, userId.toString())).rejects.toThrow('Schema not found');
+    });
+  });
+
+  describe('isWriter', () => {
+    let testSchema;
+
+    beforeEach(async () => {
+      testSchema = await createTestSchema(
+        {
+          name: 'Test Schema for Permissions',
+          schema_definition: JSON.stringify({
+            type: 'object',
+            properties: { name: { type: 'string' } },
+          }),
+        },
+        userId.toString(),
+      );
+    });
+
+    it('should return true for schema creator', async () => {
+      const result = await schemaService.isWriter(testSchema.id, userId.toString());
+      expect(result).toBe(true);
+    });
+
+    it('should return true for admin user', async () => {
+      const result = await schemaService.isWriter(testSchema.id, adminUserId.toString());
+      expect(result).toBe(true);
+    });
+
+    it('should return false for other users', async () => {
+      const otherUserId = new mongoose.Types.ObjectId();
+      const result = await schemaService.isWriter(testSchema.id, otherUserId.toString());
+      expect(result).toBe(false);
+    });
+
+    it('should throw error for non-existent schema', async () => {
+      const nonExistentId = new mongoose.Types.ObjectId();
+      await expect(schemaService.isWriter(nonExistentId, userId.toString())).rejects.toThrow('Schema not found');
     });
   });
 });
