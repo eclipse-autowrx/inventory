@@ -1,17 +1,15 @@
-// Copyright (c) 2025 Eclipse Foundation.
-// 
-// This program and the accompanying materials are made available under the
-// terms of the MIT License which is available at
-// https://opensource.org/licenses/MIT.
-//
-// SPDX-License-Identifier: MIT
-
 module.exports = {
   testEnvironment: 'node',
-  testEnvironmentOptions: {
-    NODE_ENV: 'test',
+  setupFilesAfterEnv: ['./tests/setup.js'],
+  collectCoverageFrom: ['src/**/*.js', '!src/docs/**', '!src/config/**', '!**/node_modules/**'],
+  coverageReporters: ['text', 'json', 'html', 'lcov'],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
   },
-  restoreMocks: true,
-  coveragePathIgnorePatterns: ['node_modules', 'src/config', 'src/app.js', 'tests'],
-  coverageReporters: ['text', 'lcov', 'clover', 'html'],
+  testTimeout: 10000,
 };
