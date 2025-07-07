@@ -156,6 +156,7 @@ const updateInstanceById = async (instanceId, updateBody, actionOwner) => {
 
   updateBody.action_owner = actionOwner;
   Object.assign(instance, updateBody);
+  instance.data = typeof instance.data === 'object' ? JSON.stringify(instance.data) : instance.data;
   await instance.save();
   return instance;
 };
