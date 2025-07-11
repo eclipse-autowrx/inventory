@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -20,6 +20,7 @@ const getGraphqlMiddleware = async () => {
 
   const apolloServer = new ApolloServer({
     schema,
+    introspection: true,
   });
   await apolloServer.start();
   middleware = expressMiddleware(apolloServer, {
