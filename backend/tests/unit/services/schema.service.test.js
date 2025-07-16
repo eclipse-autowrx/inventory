@@ -109,9 +109,12 @@ describe('Schema Service', () => {
     });
 
     it('should filter schemas by created_by', async () => {
+      const newUserId = new mongoose.Types.ObjectId();
+      const newCreatedSchema = await createTestSchema({}, newUserId);
+
       const result = await schemaService.querySchemas(
         {
-          created_by: createdSchemas[0].created_by.toString(),
+          created_by: newUserId.toString(),
         },
         { limit: 2 },
       );
@@ -119,7 +122,7 @@ describe('Schema Service', () => {
       expect(result.results.length).toBe(1);
       expect(result.totalPages).toBe(1);
       expect(result.totalResults).toBe(1);
-      checkSchemaMatch(result.results[0], createdSchemas[0]);
+      checkSchemaMatch(result.results[0], newCreatedSchema);
     });
 
     it('should return schemas with matching search term', async () => {

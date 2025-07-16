@@ -8,7 +8,7 @@
 
 const mongoose = require('mongoose');
 const { instanceService, schemaService } = require('../../../src/services');
-const { Instance } = require('../../../src/models');
+const { Instance, Schema } = require('../../../src/models');
 const ApiError = require('../../../src/utils/ApiError');
 const {
   testIds,
@@ -175,7 +175,7 @@ describe('Instance Service', () => {
 
     it('should throw error if schema no longer exists', async () => {
       // Mock schema not found
-      jest.spyOn(schemaService, 'getSchemaById').mockRejectedValueOnce(new ApiError(404, 'Schema not found'));
+      await Schema.deleteOne({ _id: mockSchema._id });
 
       await expect(instanceService.getInstanceById(testInstance._id)).rejects.toThrow('Schema for instance not found');
     });

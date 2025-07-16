@@ -24,7 +24,7 @@ const validateRelationCompatibility = async (relation, sourceInstance, targetIns
   if (sourceInstance.schema._id.toString() !== relation.source._id.toString()) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      `Source instance's schema (${sourceInstance.schema}) does not match relation's defined source schema (${relation.source})`,
+      `Source instance's schema (${sourceInstance.schema._id}) does not match relation's defined source schema (${relation.source})`,
     );
   }
 
@@ -32,7 +32,7 @@ const validateRelationCompatibility = async (relation, sourceInstance, targetIns
   if (targetInstance.schema._id.toString() !== relation.target._id.toString()) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      `Target instance's schema (${targetInstance.schema}) does not match relation's defined target schema (${relation.target})`,
+      `Target instance's schema (${targetInstance.schema._id}) does not match relation's defined target schema (${relation.target})`,
     );
   }
 
@@ -111,7 +111,7 @@ const createInstanceRelation = async (body, userId) => {
  * @param {Object} options - Query options
  * @returns {Promise<QueryResult>}
  */
-const queryInstanceRelations = async (filter, options) => {
+const queryInstanceRelations = async (filter = {}, options = {}) => {
   const finalOptions = { ...options };
   // Populate fields for context
   if (!finalOptions.populate) {
