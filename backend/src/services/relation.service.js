@@ -72,7 +72,7 @@ const createRelation = async (relationBody, userId) => {
  * @param {Object} [advanced] - Advanced options: eg. search
  * @returns {Promise<QueryResult>}
  */
-const queryRelations = async (filter, options, advanced) => {
+const queryRelations = async (filter = {}, options = {}, advanced = {}) => {
   const finalOptions = { ...options };
   // Ensure relations are populated with schema names for context
   if (!finalOptions.populate) {
@@ -90,7 +90,12 @@ const queryRelations = async (filter, options, advanced) => {
       ],
     ];
   }
-  const finalFilter = buildMongoSearchFilter(filter, advanced.search, ['type', 'description', 'cardinality']);
+  const finalFilter = buildMongoSearchFilter(filter, advanced.search, [
+    'name',
+    'description',
+    'source_role_name',
+    'target_role_name',
+  ]);
   const relations = await Relation.paginate(finalFilter, finalOptions);
   relations.results = await new InterservicePopulateListDecorator(relations.results)
     .populate('created_by')

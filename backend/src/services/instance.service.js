@@ -86,7 +86,7 @@ const createInstance = async (instanceBody, userId) => {
  * @param {Object} [advanced] - Advanced options
  * @returns {Promise<QueryResult>}
  */
-const queryInstances = async (filter, options, advanced) => {
+const queryInstances = async (filter = {}, options = {}, advanced = {}) => {
   const finalOptions = { ...options };
   if (!finalOptions.populate) {
     // Need wrapping array because of spread operator in paginate.plugin logic
@@ -114,18 +114,15 @@ const queryInstances = async (filter, options, advanced) => {
  * @returns {Promise<Instance>}
  */
 const getInstanceById = async (id) => {
-  const instance = await Instance.findById(id);
+  const instance = await Instance.findById(id).populate('schema');
   if (!instance) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Instance not found');
   }
 
-  const schema = await schemaService.getSchemaById(instance.schema);
-  if (!schema) {
+  if (!instance.schema) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Schema for instance not found');
   }
 
-  const parsedSchema = new ParsedJsonPropertiesMongooseDecorator(schema, 'schema_definition').getParsedPropertiesData();
-  instance._doc.schema = parsedSchema;
   return new InterservicePopulateListDecorator(
     new ParsedJsonPropertiesMongooseDecorator(instance, 'data').getParsedPropertiesData(),
   )

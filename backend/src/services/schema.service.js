@@ -30,6 +30,11 @@ const validateSchemaDefinition = async (schemaDefinition) => {
     if (error instanceof Ajv.ValidationError) {
       throw new ApiError(httpStatus.BAD_REQUEST, `Schema validation error: ${error.message}`);
     }
+
+    if (error instanceof SyntaxError) {
+      throw new ApiError(httpStatus.BAD_REQUEST, `Schema validation error: Invalid JSON format: ${error.message}`);
+    }
+
     throw new ApiError(httpStatus.BAD_REQUEST, `Schema validation error: ${error.message}`);
   }
 };
@@ -106,7 +111,12 @@ const isWriter = async (schemaId, userId) => {
  * @returns {Promise<Schema>}
  */
 const updateSchemaById = async (schemaId, updateBody, actionOwner) => {
-  const schema = await getSchemaById(schemaId); // Reuse getById to check existence
+  const schema = await Schema.findById(schemaId); // Reuse getById to check existence
+
+  if (!schema) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Schema not found');
+  }
+
   if (updateBody.schema_definition) {
     await validateSchemaDefinition(updateBody.schema_definition);
   }

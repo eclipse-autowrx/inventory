@@ -22,6 +22,7 @@ const schemaSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+      maxLength: 4000,
     },
     schema_definition: {
       type: String,
