@@ -1,5 +1,5 @@
 // Copyright (c) 2025 Eclipse Foundation.
-// 
+//
 // This program and the accompanying materials are made available under the
 // terms of the MIT License which is available at
 // https://opensource.org/licenses/MIT.
@@ -57,18 +57,7 @@ app.use(mongoSanitize());
 // gzip compression
 app.use(compression());
 
-// enable cors
-if (config.env === 'development') {
-  app.use(cors('*'));
-} else {
-  app.use(
-    cors({
-      origin: config.cors.regex,
-      credentials: true,
-    }),
-  );
-}
-
+app.use(cors('*'));
 app.options('*', cors());
 
 app.use('/v2', convertUserHeader, routes);
